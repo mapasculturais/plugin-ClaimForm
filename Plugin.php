@@ -2,6 +2,7 @@
 
 namespace ClaimForm;
 
+use MapasCulturais\i;
 use MapasCulturais\App;
 use MapasCulturais\Definitions\FileGroup;
 
@@ -74,6 +75,15 @@ class Plugin extends \MapasCulturais\Plugin
     {
         /** @var App $app */
         $app = App::i();
+
+        $this->registerOpportunityMetadata('claimDisabled', [
+            'label' => i::__('Desabilitar formulário de recursos'),
+            'type' => 'select',
+            'options' => (object)[
+                '0' => i::__('formulário de recurso habilitado'),
+                '1' => i::__('formulário de recurso desabilitado'),
+            ]
+        ]);
 
         $this->registerOpportunityMetadata('claimEmail', [
             'label' => \MapasCulturais\i::__('Email de destino do formulário de recursos'),
