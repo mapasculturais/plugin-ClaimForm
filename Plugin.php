@@ -61,6 +61,13 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('entity(Registration).file(formClaimUpload).insert:after', function ($args) use ($self) {
             $self->sendMailClaim($this);
         });
+
+           // adiciona o botão de recurso na lista de
+           $app->hook("template(opportunity.<<*>>.user-registration-table--registration--status):end", function ($registration, $opportunity){
+            if($registration->canUser('sendClaimMessage')){
+                $this->part('message-registration-status-table');
+            }
+        });
     }
 
     public function register()
