@@ -11,6 +11,15 @@ class Plugin extends \MapasCulturais\Plugin
 
     public function __construct(array $config = array())
     {
+        /** @var App $app */
+        $app = App::i();
+        
+        $app->hook('app.modules.init:before', function(&$modules) use($config) {
+            if (($key = array_search('OpportunityClaimForm', $modules)) !== false) {
+                unset($modules[$key]);
+            }
+        });
+
         parent::__construct($config);
     }
 
