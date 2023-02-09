@@ -1,9 +1,9 @@
-.deleteRight{
+.buttons-rigth{
     display: block;
     float: right;
     margin-right: 10px;
 }
-.confiButtongeneral{
+.claim-form-buttons{
     margin-bottom: 30px;
     display: flex;
     flex-direction: row;

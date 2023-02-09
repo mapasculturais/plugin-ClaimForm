@@ -4,7 +4,7 @@
 
     module.controller('ClaimFormController', ['$scope', '$timeout', 'ClaimFormService', function ($scope, $timeout, ClaimFormService) {
         $scope.maxUploadSizeFormatted = MapasCulturais.maxUploadSizeFormatted;
-
+        
         $scope.open = function (editbox, id, event) {
             MapasCulturais.AjaxUploader.init()
             editbox.open(id, event)
@@ -16,14 +16,16 @@
 
             var $form = $('#send-clain-form');
 
-            
-
             $form.submit();
             if (!$form.data('onSuccess')) {
                 $form.data('onSuccess', true);
                 $form.on('ajaxForm.success', function (evt, response) {
+                    $(".js-formClaimUpload").html("")
                     var template = MapasCulturais.TemplateManager.getTemplate('claim-form-response');
-                    var data = response['formClaimUpload'][0];
+                    var data = response['formClaimUpload'];
+                    data.acceptClaimUrl = MapasCulturais.createUrl('registration', 'acceptClaim', [data.id]);
+                    data.canAcceptClaim = $scope.canAcceptClaim();
+                    console.log(data)
                     var html = Mustache.render(template,data);
                     $(".edit-box").hide()
                     $(".js-formClaimUpload").append(html)
@@ -33,6 +35,22 @@
                     MapasCulturais.Messages.success("Recurso enviado com sucesso");
                 });
             }
+        }
+
+        $scope.canAcceptClaim = function(){
+            var alloweds = [
+                'saasSuperAdmin',
+                'superAdmin',
+                'admin'
+            ];
+            var result = false;
+            alloweds.forEach(function(item){
+                if(MapasCulturais.roles.includes(item)){
+                    result = true;
+                    return;
+                }
+            })
+            return result;
         }
     }]);
 

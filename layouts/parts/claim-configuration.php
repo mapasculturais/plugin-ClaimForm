@@ -22,6 +22,10 @@ $owner_email = $opportunity->owner->emailPrivado ? $opportunity->owner->emailPri
     </div>
     <br>
     <div>
+        <?php $this->part('claim-form-period', ['opportunity' => $opportunity]) ?>
+    </div>
+    <br>
+    <div>
         <?php $this->part('claim-configuration-sample-upload', ['opportunity' => $opportunity]) ?>
     </div>
 </div>
