@@ -31,6 +31,23 @@ class Plugin extends \MapasCulturais\Plugin
 
         $self = $this;
 
+        $app->hook('GET(registration.acceptClaim)', function () use ($app) {
+            $this->requireAuthentication();
+
+            if ($app->user->is('admin')) {
+                $file = $app->repo('file')->find($this->data['id']);
+                $registration = $file->owner;
+
+                $app->disableAccessControl();
+                $registration->acceptClaim = true;
+                $registration->save(true);
+                $app->enableAccessControl();
+
+                $url = $app->createUrl('inscricao');
+                $app->redirect($url . "/" . $registration->id);
+            }
+        });
+
         // Adiciona seção de configuração do formulário de recurso dentro da configuração do formulário
         $app->hook("view.partial(singles/opportunity-registrations--export):after", function () {
             $this->part('claim-configuration', ['opportunity' => $this->controller->requestedEntity]);
