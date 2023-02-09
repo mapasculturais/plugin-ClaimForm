@@ -14,8 +14,8 @@ class Plugin extends \MapasCulturais\Plugin
     {
         /** @var App $app */
         $app = App::i();
-        
-        $app->hook('app.modules.init:before', function(&$modules) use($config) {
+
+        $app->hook('app.modules.init:before', function (&$modules) use ($config) {
             if (($key = array_search('OpportunityClaimForm', $modules)) !== false) {
                 unset($modules[$key]);
             }
@@ -53,16 +53,16 @@ class Plugin extends \MapasCulturais\Plugin
             $this->part('claim-configuration', ['opportunity' => $this->controller->requestedEntity]);
         });
 
-        // Define a permissão de modificação da inscrição true apoos enviada caso o upload de arquivo seja do recurso
-        $app->hook('can(RegistrationFile.<<*>>)', function ($user, &$result) {
+        // Define a permissãopara inserir arquivos na inscrição apos a mesma estar fechada
+        $app->hook('can(RegistrationFile.<<*>>)', function ($user, &$result) use ($app, $self) {
             /** @var \MapasCulturais\Entities\RegistrationFile $this */
-            if ($this->group === "formClaimUpload" && $this->owner->opportunity->publishedRegistrations && $this->owner->owner->canUser('@control')) {
+            if ($this->group === "formClaimUpload" && $this->owner->opportunity->publishedRegistrations) {
                 $result = true;
             }
         });
 
         /** Altera permissão canUserView  */
-        $app->hook('entity(Registration).canUser(sendClaimMessage)', function ($user, &$canUser) {
+        $app->hook('entity(Registration).canUser(sendClaimMessage)', function ($user, &$canUser) use ($self) {
             $opportunity = $this->opportunity;
             // se o status for maior que 0 significa que a inscrição foi enviada
             if ($this->status > 0 && $opportunity->publishedRegistrations && !$opportunity->claimDisabled && $this->canUser('view')) {
@@ -73,7 +73,7 @@ class Plugin extends \MapasCulturais\Plugin
         });
 
         /** Coloca o template do recurso dentro da tela de inscrição */
-        $app->hook('template(registration.view.registration-sidebar-rigth):end', function () use ($app) {
+        $app->hook('template(registration.view.registration-sidebar-rigth):end', function () use ($app, $self) {
             /** @var Theme $this */
             $this->enqueueStyle('app', 'claim-form-css', 'css/claim-form.css');
             $app->view->jsObject['angularAppDependencies'][] = 'ng.claim-form';
@@ -81,18 +81,21 @@ class Plugin extends \MapasCulturais\Plugin
 
             $registration = $this->controller->requestedEntity;
             if ($registration->canUser('sendClaimMessage')) {
-                $this->part('claim-form-upload', ['entity' => $registration]);
+                $canManipulate = $self->canManipulate($registration);
+                $claim_open = $self->claimOpen($registration);
+                $this->part('claim-form-upload', ['entity' => $registration, 'canManipulate' => $canManipulate, 'claim_open' => $claim_open]);
             };
         });
 
         /** Envia o e-mail de recurso para o administrador */
         $app->hook('entity(Registration).file(formClaimUpload).insert:after', function ($args) use ($self) {
             $self->sendMailClaim($this);
+            $self->sendMailClaimCertificate($this);
         });
 
-           // adiciona o botão de recurso na lista de
-           $app->hook("template(opportunity.<<*>>.user-registration-table--registration--status):end", function ($registration, $opportunity){
-            if($registration->canUser('sendClaimMessage')){
+        // adiciona o botão de recurso na lista de
+        $app->hook("template(opportunity.<<*>>.user-registration-table--registration--status):end", function ($registration, $opportunity) {
+            if ($registration->canUser('sendClaimMessage')) {
                 $this->part('message-registration-status-table');
             }
         });
@@ -212,5 +215,64 @@ class Plugin extends \MapasCulturais\Plugin
                 'body' => $message['body']
             ]);
         }
+    }
+
+    public function sendMailClaimCertificate($entity)
+    {
+        /** @var App $app */
+        $app = App::i();
+
+        $registration = $entity->owner;
+
+        $registration->checkPermission('sendClaimMessage');
+
+        $opportunity = $registration->opportunity;
+
+        $dataValue = [
+            'opportunityName' => $opportunity->name,
+            'opportunityUrl' => $opportunity->singleUrl,
+            'registrationNumber' => $registration->number,
+            'registrationUrl' => $registration->singleUrl,
+            'date' => date('d/m/Y H:i:s', $_SERVER['REQUEST_TIME']),
+            'message' => $entity->description,
+            'userName' => $app->user->profile->name,
+            'userUrl' => $app->user->profile->url,
+            'file' =>  $entity->url
+        ];
+
+        $message = $app->renderMailerTemplate('claim_certificate', $dataValue);
+
+        if (array_key_exists('mailer.from', $app->config) && !empty(trim($app->config['mailer.from']))) {
+            /*
+             * Envia e-mail para o administrador da Oportunidade
+             */
+            $app->createAndSendMailMessage([
+                'from' => $app->config['mailer.from'],
+                'to' => $app->user->profile->emailPrivado,
+                'subject' => $message['title'],
+                'body' => $message['body']
+            ]);
+        }
+    }
+
+    public function canManipulate($registration)
+    {
+        $app = App::i();
+        if ($this->claimOpen($registration)) {
+            if ((($app->user->profile->id == $registration->owner->id) && !$registration->acceptClaim) || $app->user->is('saasSuperAdmin')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function claimOpen($registration)
+    {
+        $today = new DateTime();
+        if ($today >= $registration->opportunity->claimFrom && $today <= $registration->opportunity->claimTo) {
+            return true;
+        }
+        return false;
     }
 }
