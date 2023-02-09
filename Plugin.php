@@ -2,6 +2,7 @@
 
 namespace ClaimForm;
 
+use DateTime;
 use MapasCulturais\i;
 use MapasCulturais\App;
 use MapasCulturais\Definitions\FileGroup;
@@ -101,8 +102,55 @@ class Plugin extends \MapasCulturais\Plugin
             ]
         ]);
 
-        $app->registerFileGroup('registration', new FileGroup('formClaimUpload', ['^application/pdf'], 'O arquivo não e valido'));
-        $app->registerFileGroup('opportunity', new FileGroup('formClaimUploadSample', ['^application/pdf'], 'O arquivo não e valido', true));
+        $this->registerOpportunityMetadata('claimFrom', [
+            'label' => \MapasCulturais\i::__('Data de inicio do recurso'),
+            'type' => 'date',
+            'unserialize' => function ($value) {
+                return new DateTime($value);
+            }
+        ]);
+
+        $this->registerOpportunityMetadata('claimTo', [
+            'label' => \MapasCulturais\i::__('Data de fim do recurso'),
+            'type' => 'date',
+            'unserialize' => function ($value) {
+                return new DateTime($value);
+            }
+        ]);
+
+        $this->registerRegistrationMetadata('acceptClaim', [
+            'label' => \MapasCulturais\i::__('Idicação de aceite do recurso por parte do administrador'),
+            'type' => 'json',
+            'default' => false
+        ]);
+
+        $app->registerFileGroup(
+            'registration',
+            new FileGroup(
+                'formClaimUpload',
+                ['^application/pdf'],
+                'O arquivo não é valido',
+                true
+            )
+        );
+
+        $app->registerFileGroup(
+            'opportunity',
+            new FileGroup(
+                'formClaimUploadSample',
+                [
+                    '^application/pdf',
+                    'application/vnd\.openxmlformats-officedocument\.wordprocessingml\.document',
+                    'application/vnd\.openxmlformats-officedocument\.wordprocessingml\.template',
+                    'application/vnd\.ms-word\.document\.macroEnabled\.12',
+                    'application/vnd\.ms-word\.template\.macroEnabled\.12',
+                    'application/x-abiword',
+                    'application/msword'
+                ],
+                'O arquivo não é valido',
+                true
+            )
+        );
     }
 
     public function sendMailClaim($entity)
