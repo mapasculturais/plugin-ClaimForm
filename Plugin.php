@@ -48,6 +48,16 @@ class Plugin extends \MapasCulturais\Plugin
             }
         });
 
+        $app->hook("entity(RegistrationFile).remove:after", function() use ($app){
+            if ($this->group === "formClaimUpload"){
+                $registration = $this->owner;
+                $app->disableAccessControl();
+                $registration->acceptClaim = false;
+                $registration->save(true);
+                $app->enableAccessControl();
+            }
+        });
+
         // Adiciona seção de configuração do formulário de recurso dentro da configuração do formulário
         $app->hook("view.partial(singles/opportunity-registrations--export):after", function () {
             $this->part('claim-configuration', ['opportunity' => $this->controller->requestedEntity]);
@@ -57,7 +67,7 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('can(RegistrationFile.<<*>>)', function ($user, &$result) use ($app, $self) {
             /** @var \MapasCulturais\Entities\RegistrationFile $this */
             if ($this->group === "formClaimUpload" && $this->owner->opportunity->publishedRegistrations) {
-                if(!$this->owner->acceptClaim){
+                if(!$this->owner->acceptClaim || $app->user->is('saasSuperAdmin')){
                     $result = true;
                 }
             }
@@ -142,7 +152,7 @@ class Plugin extends \MapasCulturais\Plugin
 
         $this->registerRegistrationMetadata('acceptClaim', [
             'label' => \MapasCulturais\i::__('Idicação de aceite do recurso por parte do administrador'),
-            'type' => 'json',
+            'type' => 'bool',
             'default' => false
         ]);
 

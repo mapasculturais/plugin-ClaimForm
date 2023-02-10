@@ -17,7 +17,7 @@ $accept_claim_url = $app->createUrl("registration", 'acceptClaim');
     <small><strong><i><?php i::_e("Período de recurso {$claim_from} a $claim_to") ?></strong></i></small>
 
     <div class="claim-form-buttons">
-        <?php if ($canManipulate) : ?>
+        <?php if ($canManipulate || $app->user->is('saasSuperAdmin')) : ?>
             <a class="add btn btn-default" ng-click="open(editbox, 'form-claim', $event)" rel="noopener noreferrer"><?= i::_e('Formulário de recurso') ?></a>
             <?php if ($filesSample) : ?>
                 <a class="add btn btn-default download" download href="<?= $filesSample->url ?>"><?= i::_e('Baixar arquivo de exemplo') ?></a>
@@ -62,7 +62,7 @@ $accept_claim_url = $app->createUrl("registration", 'acceptClaim');
                         <a href="<?=$accept_claim_url?><?=$file->id?>"  class="buttons-rigth hltip" title="Aceitar arquivo"><i class="fas fa-check"></i> <span class="configdelete"><?php i::_e("Aceitar"); ?></span></a>
                     <?php endif; ?>
 
-                    <?php if ($canManipulate) : ?>                        
+                    <?php if ($canManipulate || $app->user->is('saasSuperAdmin')) : ?>                        
                         <a data-href="<?php echo $file->deleteUrl ?>" data-target="#file-<?php echo $file->id ?>" data-configm-message="Remover este arquivo?" class="buttons-rigth delete hltip js-remove-item" data-hltip-classes="hltip-ajuda" title="Excluir arquivo."><span class="configdelete"><?php i::_e("Excluir"); ?></span></a>
                     <?php endif; ?>
                     
