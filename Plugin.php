@@ -57,7 +57,9 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('can(RegistrationFile.<<*>>)', function ($user, &$result) use ($app, $self) {
             /** @var \MapasCulturais\Entities\RegistrationFile $this */
             if ($this->group === "formClaimUpload" && $this->owner->opportunity->publishedRegistrations) {
-                $result = true;
+                if(!$this->owner->acceptClaim || $app->user->is('saasSuperAdmin')){
+                    $result = true;
+                }
             }
         });
 
@@ -259,8 +261,10 @@ class Plugin extends \MapasCulturais\Plugin
     {
         $app = App::i();
         if ($this->claimOpen($registration)) {
-            if ((($app->user->profile->id == $registration->owner->id) && !$registration->acceptClaim) || $app->user->is('saasSuperAdmin')) {
-                return true;
+            if ((($app->user->profile->id == $registration->owner->id)) || $app->user->is('saasSuperAdmin')) {
+                if(!$registration->acceptClaim){
+                    return true;
+                }
             }
         }
 

@@ -17,12 +17,13 @@ $accept_claim_url = $app->createUrl("registration", 'acceptClaim');
     <small><strong><i><?php i::_e("Período de recurso {$claim_from} a $claim_to") ?></strong></i></small>
 
     <div class="claim-form-buttons">
-        <?php if ($claim_open) : ?>
+        <?php if ($canManipulate) : ?>
             <a class="add btn btn-default" ng-click="open(editbox, 'form-claim', $event)" rel="noopener noreferrer"><?= i::_e('Formulário de recurso') ?></a>
             <?php if ($filesSample) : ?>
                 <a class="add btn btn-default download" download href="<?= $filesSample->url ?>"><?= i::_e('Baixar arquivo de exemplo') ?></a>
             <?php endif ?>
         <?php endif ?>
+
         <br>
     </div>
 
