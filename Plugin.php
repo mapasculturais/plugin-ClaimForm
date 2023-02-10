@@ -235,8 +235,8 @@ class Plugin extends \MapasCulturais\Plugin
             'registrationUrl' => $registration->singleUrl,
             'date' => date('d/m/Y H:i:s', $_SERVER['REQUEST_TIME']),
             'message' => $entity->description,
-            'userName' => $app->user->profile->name,
-            'userUrl' => $app->user->profile->url,
+            'userName' => $registration->owner->name,
+            'userUrl' => $registration->owner->url ?: "#",
             'file' =>  $entity->url
         ];
 
