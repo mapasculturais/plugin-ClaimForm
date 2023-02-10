@@ -248,7 +248,7 @@ class Plugin extends \MapasCulturais\Plugin
              */
             $app->createAndSendMailMessage([
                 'from' => $app->config['mailer.from'],
-                'to' => $app->user->profile->emailPrivado,
+                'to' => $registration->owner->emailPrivado,
                 'subject' => $message['title'],
                 'body' => $message['body']
             ]);
