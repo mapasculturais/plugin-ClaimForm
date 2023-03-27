@@ -271,7 +271,7 @@ class Plugin extends \MapasCulturais\Plugin
     {
         $app = App::i();
         if ($this->claimOpen($registration)) {
-            if ((($app->user->profile->id == $registration->owner->id)) || $app->user->profile->id == $registration->owner->parent || $app->user->is('saasSuperAdmin')) {
+            if ((($app->user->profile->id == $registration->owner->id)) || $app->user->profile->id == $registration->owner->parent->id || $app->user->is('saasSuperAdmin')) {
                 if(!$registration->acceptClaim){
                     return true;
                 }
