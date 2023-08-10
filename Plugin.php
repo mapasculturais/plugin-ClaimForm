@@ -21,6 +21,15 @@ class Plugin extends \MapasCulturais\Plugin
             }
         });
 
+        $app->hook('app.init:after', function () use($app) {
+            $app->hook('component(opportunity-phases-timeline).registration:end', function () {
+                $registration = $this->controller->requestedEntity;
+                if($registration->canUser('sendClaimMessage')){
+                    $this->part('opportunity-claim-form-component');
+                }
+            });
+        });
+        
         parent::__construct($config);
     }
 
