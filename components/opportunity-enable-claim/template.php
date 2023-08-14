@@ -9,6 +9,7 @@ use MapasCulturais\i;
 
 $this->import('
     mc-link
+    mc-modal
 ');
 ?>
 
@@ -30,6 +31,29 @@ $this->import('
         </label>
         <div class="opportunity-enable-claim__save">
             <input type="text" v-model="entity.claimEmail" @change="autoSave()" />
+        </div>
+    </div>
+
+    <div>
+        <div>
+            <input type="checkbox" v-model="activateAttachment" />
+            <label for="resource"><?= i::__("Habilitar anexo de arquivo para recurso") ?></label><br>
+        </div>
+
+        <div v-if="activateAttachment">
+            <h4><?php i::_e('Envie um modelo de documento que deve ser anexado pelos solicitantes') ?></h4>
+            <mc-modal title="Anexar arquivo de exemplo" button-label="<?php i::_e('Enviar') ?>">
+                <template #default="modal">
+                    <div>
+                        <input type="file" name="formClaimUploadSample" @change="setFile" ref="file">
+                    </div>
+                </template>
+                <template #actions="modal">
+                    <button type="button">
+                        <?php i::_e("Salvar") ?>
+                    </button>
+                </template>
+            </mc-modal>
         </div>
     </div>
 </div>
