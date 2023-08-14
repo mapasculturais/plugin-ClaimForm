@@ -16,6 +16,8 @@ app.component('opportunity-enable-claim', {
         return {
             isActiveClaim,
             timeOut: null,
+            newFile: {},
+            activateAttachment: false
         }
     },
     watch: {
@@ -26,6 +28,9 @@ app.component('opportunity-enable-claim', {
         },
     },
     methods: {
+        setFile() {
+            this.newFile = this.$refs.file.files[0];
+        },
         isActive(active) {
             this.entity.claimDisabled = active ? 0 : 1;
         },
