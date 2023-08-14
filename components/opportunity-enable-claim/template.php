@@ -16,7 +16,7 @@ $this->import('
     <h4 class="bold opportunity-enable-claim__title">Recurso</h4>
     <div class="opportunity-enable-claim__input ">
         <input type="checkbox" id="resource" v-model="isActiveClaim" @click="autoSave()" />
-        <label for="resource"><?= i::__("Habilitar Recurso") ?></label>
+        <label for="resource"><?= i::__("Habilitar solicitação de recurso") ?></label>
     </div>
     <div class="grid-12">
         <entity-field :entity="entity" classes="col-3 sm:col-12" prop="claimFrom"></entity-field>
