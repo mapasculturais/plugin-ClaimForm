@@ -145,7 +145,7 @@ class Plugin extends \MapasCulturais\Plugin
 
         $this->registerOpportunityMetadata('claimFrom', [
             'label' => \MapasCulturais\i::__('Data de inicio do recurso'),
-            'type' => 'date',
+            'type' => 'datetime',
             'unserialize' => function ($value) {
                 return new DateTime($value);
             }
@@ -153,7 +153,7 @@ class Plugin extends \MapasCulturais\Plugin
 
         $this->registerOpportunityMetadata('claimTo', [
             'label' => \MapasCulturais\i::__('Data de fim do recurso'),
-            'type' => 'date',
+            'type' => 'datetime',
             'unserialize' => function ($value) {
                 return new DateTime($value);
             }
