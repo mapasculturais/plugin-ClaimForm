@@ -127,6 +127,15 @@ class Plugin extends \MapasCulturais\Plugin
         /** @var App $app */
         $app = App::i();
 
+        $this->registerOpportunityMetadata('activateAttachment', [
+            'label' => i::__('Habilitar anexo de arquivo para recurso'),
+            'type' => 'select',
+            'options' => (object)[
+                '0' => i::__('Anexo habilitado'),
+                '1' => i::__('Anexo desabilitado'),
+            ]
+        ]);
+
         $this->registerOpportunityMetadata('claimDisabled', [
             'label' => i::__('Desabilitar formulário de recursos'),
             'type' => 'select',
@@ -145,7 +154,7 @@ class Plugin extends \MapasCulturais\Plugin
 
         $this->registerOpportunityMetadata('claimFrom', [
             'label' => \MapasCulturais\i::__('Data de inicio do recurso'),
-            'type' => 'date',
+            'type' => 'datetime',
             'unserialize' => function ($value) {
                 return new DateTime($value);
             }
@@ -153,18 +162,10 @@ class Plugin extends \MapasCulturais\Plugin
 
         $this->registerOpportunityMetadata('claimTo', [
             'label' => \MapasCulturais\i::__('Data de fim do recurso'),
-            'type' => 'date',
+            'type' => 'datetime',
             'unserialize' => function ($value) {
                 return new DateTime($value);
             }
-        ]);
-
-        $this->registerOpportunityMetadata('claimTimeTo', [
-            'label' => \MapasCulturais\i::__('Hora final do recurso'),
-            'type' => 'time',
-            'unserialize' => function ($value) {
-                return (new DateTime($value))->format('H:i:s');
-            },
         ]);
 
         $this->registerRegistrationMetadata('acceptClaim', [
