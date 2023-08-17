@@ -159,14 +159,6 @@ class Plugin extends \MapasCulturais\Plugin
             }
         ]);
 
-        $this->registerOpportunityMetadata('claimTimeTo', [
-            'label' => \MapasCulturais\i::__('Hora final do recurso'),
-            'type' => 'time',
-            'unserialize' => function ($value) {
-                return (new DateTime($value))->format('H:i:s');
-            },
-        ]);
-
         $this->registerRegistrationMetadata('acceptClaim', [
             'label' => \MapasCulturais\i::__('Idicação de aceite do recurso por parte do administrador'),
             'type' => 'bool',
