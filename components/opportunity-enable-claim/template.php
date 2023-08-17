@@ -23,7 +23,6 @@ $this->import('
     <div class="grid-12">
         <entity-field :entity="entity" classes="col-3 sm:col-12" prop="claimFrom"></entity-field>
         <entity-field :entity="entity" classes="col-3 sm:col-12" prop="claimTo"></entity-field>
-        <entity-field :entity="entity" classes="col-2 sm:col-12" prop="claimTimeTo"></entity-field>
     </div>
 
     <div v-if="isActiveClaim" class="opportunity-enable-claim__email">
