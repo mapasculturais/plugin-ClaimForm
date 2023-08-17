@@ -127,6 +127,15 @@ class Plugin extends \MapasCulturais\Plugin
         /** @var App $app */
         $app = App::i();
 
+        $this->registerOpportunityMetadata('activateAttachment', [
+            'label' => i::__('Habilitar anexo de arquivo para recurso'),
+            'type' => 'select',
+            'options' => (object)[
+                '0' => i::__('Anexo habilitado'),
+                '1' => i::__('Anexo desabilitado'),
+            ]
+        ]);
+
         $this->registerOpportunityMetadata('claimDisabled', [
             'label' => i::__('Desabilitar formulário de recursos'),
             'type' => 'select',

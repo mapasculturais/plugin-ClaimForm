@@ -12,12 +12,13 @@ app.component('opportunity-enable-claim', {
         }
     },
     data() {
-        let isActiveClaim = this.entity.claimDisabled === "0" ? true : false;
+        let isActiveClaim = this.entity.claimDisabled === "1" ? true : false;
+        let activateAttachment = this.entity.activateAttachment === "1" ? true : false;
         return {
             isActiveClaim,
+            activateAttachment,
             timeOut: null,
             newFile: {},
-            activateAttachment: false
         }
     },
     watch: {
