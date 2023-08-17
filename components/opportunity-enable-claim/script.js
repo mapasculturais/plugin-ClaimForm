@@ -26,13 +26,21 @@ app.component('opportunity-enable-claim', {
                 this.isActive(_new);
             }
         },
+        'activateAttachment'(_new,_old){
+            if(_new != _old){
+                this.isActiveAttachment(_new);
+            }
+        }
     },
     methods: {
         setFile() {
             this.newFile = this.$refs.file.files[0];
         },
         isActive(active) {
-            this.entity.claimDisabled = active ? 0 : 1;
+            this.entity.claimDisabled = active ? 1 : 0;
+        },
+        isActiveAttachment(active) {
+            this.entity.activateAttachment = active ? 1 : 0;
         },
 
         autoSave(){
