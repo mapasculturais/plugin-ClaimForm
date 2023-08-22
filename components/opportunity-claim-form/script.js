@@ -50,7 +50,13 @@ app.component('opportunity-claim-form', {
 
     computed: {
         modalTitle() {
-            return 'Solicitar Recurso';
+            return this.text('Solicitar Recurso');
+        },
+        claimFromDate() {
+            return this.entity.opportunity.claimFrom.date('numeric year') +" "+ this.entity.opportunity.claimFrom.time('long');
+        },
+        claimclaimTo() {
+            return this.entity.opportunity.claimTo.date('numeric year') +" "+ this.entity.opportunity.claimTo.time('long');
         },
     },
 });
