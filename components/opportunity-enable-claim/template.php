@@ -9,6 +9,7 @@ use MapasCulturais\i;
 
 $this->import('
     entity-field
+    mc-icon
     mc-link
     mc-modal
 ');
@@ -20,7 +21,7 @@ $this->import('
         <input type="checkbox" id="resource" v-model="isActiveClaim" @click="autoSave()" />
         <label for="resource"><?= i::__("Habilitar solicitação de recurso") ?></label>
     </div>
-    <div  v-if="isActiveClaim">
+    <div v-if="isActiveClaim">
         <div class="grid-12">
             <entity-field :entity="entity" classes="col-3 sm:col-12" prop="claimFrom"></entity-field>
             <entity-field :entity="entity" classes="col-3 sm:col-12" prop="claimTo"></entity-field>
@@ -37,24 +38,23 @@ $this->import('
 
         <div>
             <div>
-                <input type="checkbox" v-model="activateAttachment" @change="autoSave()"/>
+                <input type="checkbox" v-model="activateAttachment" @change="autoSave()" />
                 <label for="resource"><?= i::__("Habilitar anexo de arquivo para recurso") ?></label><br>
             </div>
 
             <div v-if="activateAttachment">
                 <h4><?php i::_e('Envie um modelo de documento que deve ser anexado pelos solicitantes') ?></h4>
-                <mc-modal title="Anexar arquivo de exemplo" button-label="<?php i::_e('Enviar') ?>">
-                    <template #default="modal">
-                        <div>
-                            <input type="file" name="formClaimUploadSample" @change="setFile" ref="file">
-                        </div>
-                    </template>
-                    <template #actions="modal">
-                        <button type="button">
-                            <?php i::_e("Salvar") ?>
-                        </button>
-                    </template>
-                </mc-modal>
+                <div>
+                    <input type="file" name="formClaimUploadSample" @change="setFile" ref="file">
+                </div>
+                <div v-if="files">
+                    <ul>
+                        <li>
+                           <a :href="files.url" target="_blank"> {{files.name}}</a>
+                            <a href=""><mc-icon name="delete"></mc-icon> <?= i::_e('Deletar') ?></a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

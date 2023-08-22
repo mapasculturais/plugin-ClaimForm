@@ -14,7 +14,10 @@ app.component('opportunity-enable-claim', {
     data() {
         let isActiveClaim = this.entity.claimDisabled === "1" ? true : false;
         let activateAttachment = this.entity.activateAttachment === "1" ? true : false;
+        group = "formClaimUploadSample";
+
         return {
+            group,
             isActiveClaim,
             activateAttachment,
             timeOut: null,
@@ -36,6 +39,7 @@ app.component('opportunity-enable-claim', {
     methods: {
         setFile() {
             this.newFile = this.$refs.file.files[0];
+            this.upload();
         },
         isActive(active) {
             this.entity.claimDisabled = active ? 1 : 0;
@@ -43,7 +47,18 @@ app.component('opportunity-enable-claim', {
         isActiveAttachment(active) {
             this.entity.activateAttachment = active ? 1 : 0;
         },
+        upload() {
+            let data = {
+                group: this.group,
+                description: this.newFile.description
+            };
 
+            this.entity.upload(this.newFile, data).then((response) => {
+                // console.log(response)
+            });
+
+            return true;
+        },
         autoSave(){
             clearTimeout(this.timeout);
                 this.timeout = setTimeout(()=>{
@@ -52,6 +67,11 @@ app.component('opportunity-enable-claim', {
         }
     },
     computed: {
+        files() {
+        console.log(this.entity.files);
 
+            return this.entity.files?.[this.group] || []
+        }
+        
     }
 })
