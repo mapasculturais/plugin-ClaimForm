@@ -77,7 +77,7 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('entity(Registration).canUser(sendClaimMessage)', function ($user, &$canUser) use ($self) {
             $opportunity = $this->opportunity;
             // se o status for maior que 0 significa que a inscrição foi enviada
-            if ($this->status > 0 && $opportunity->publishedRegistrations && !$opportunity->claimDisabled && $this->canUser('view')) {
+            if ($this->status > 0 && $opportunity->publishedRegistrations && $opportunity->claimDisabled && $this->canUser('view')) {
                 $canUser = true;
             } else {
                 $canUser = false;
