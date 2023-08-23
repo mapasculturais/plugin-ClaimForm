@@ -17,11 +17,17 @@ $this->import('
     <mc-modal :title="modalTitle" classes="opportunity-claim-form" button-classes="opportunity-claim-form__buttonlabel">
         <template #default>
             <div>
-                <label class="button button--primary-outline button--icon" for="formClaimUploadSample">
-                    <mc-icon name="upload"></mc-icon> Enviar
-                </label>
-                <input type="file" id="formClaimUploadSample" name="formClaimUploadSample" @change="setFile" ref="file">
-                <a href="#" download="filename"><?php i::_e("Baixe o arquivo modelo para o anexo")?></a>
+                <h4><?php i::_e('Envie um modelo de documento que deve ser anexado pelos solicitantes') ?></h4>
+                <div>
+                    <input type="file" name="formClaimUploadSample" @change="setFile()" ref="file">
+                </div>
+                <div v-if="filesUpload.url">
+                    <ul>
+                        <li>
+                            <a :href="filesUpload.url" target="_blank" download >{{filesUpload.name}}</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
             <div class="opportunity-claim-form__content">
                 <h5 class="semibold opportunity-claim-form__label"><?php i::_e('Descreva abaixo os motivos do recurso') ?></h5>
@@ -40,4 +46,11 @@ $this->import('
             <button class="button button--primary-outline" @click="open(modal)"><?php i::_e('Solicitar Recurso') ?></button>
         </template>
     </mc-modal>
+    <div v-if="filesSample.url">
+        <ul>
+            <li>
+                <a :href="filesSample.url" target="_blank" download ><?php i::_e('Baixar arquivo de exemplo') ?></a>
+            </li>
+        </ul>
+    </div>
 </div>

@@ -11,11 +11,16 @@ app.component('opportunity-claim-form', {
             type: Entity,
             required: true
         },
-
     },
 
     data() {
+        groupFileSample = "formClaimUploadSample";
+        groupFileUpload = "formClaimUpload";
+        newFile = {};
         return {
+            groupFileSample,
+            groupFileUpload,
+            newFile,
             claim: {
                 registration_id: $MAPAS.config.opportunityClaimForm.registrationId
             },
@@ -35,7 +40,7 @@ app.component('opportunity-claim-form', {
             if (this.entity.opportunity.status > 0 && this.entity.opportunity.publishedRegistrations && this.entity.opportunity.claimDisabled === "0") {
                 return true;
             }
-            return false;
+            return true;
         },
         async sendClain(modal) {
             let api = new API();
@@ -44,8 +49,21 @@ app.component('opportunity-claim-form', {
                 this.messages.success(this.text('Solicitação de recurso enviada'));
                 this.close(modal);
             });
-
-        }
+        },
+        setFile() {
+            this.newFile = this.$refs.file.files[0]
+            this.upload();
+        },
+        upload() {
+            let data = {
+                    group: this.groupFileUpload,
+                    description: this.newFile.description
+                };
+            this.entity.upload(this.newFile, data).then((response) => {
+                    // console.log(response)
+            });
+            return true;
+        },
     },
 
     computed: {
@@ -58,6 +76,12 @@ app.component('opportunity-claim-form', {
         claimclaimTo() {
             return this.entity.opportunity.claimTo.date('numeric year') +" "+ this.entity.opportunity.claimTo.time('long');
         },
+        filesSample() {
+            return this.entity.opportunity.files?.[this.groupFileSample] || [];
+        },
+        filesUpload(){
+            return this.entity.files?.[this.groupFileUpload] || [];
+        }
     },
 });
 
