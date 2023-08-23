@@ -20,15 +20,6 @@ class Plugin extends \MapasCulturais\Plugin
                 unset($modules[$key]);
             }
         });
-
-        $app->hook('app.init:after', function () use($app) {
-            $app->hook('component(opportunity-phases-timeline).registration:end', function () {
-                $registration = $this->controller->requestedEntity;
-                if($registration->canUser('sendClaimMessage')){
-                    $this->part('opportunity-claim-form-component');
-                }
-            });
-        });
         
         parent::__construct($config);
     }
@@ -119,6 +110,15 @@ class Plugin extends \MapasCulturais\Plugin
             if ($registration->canUser('sendClaimMessage')) {
                 $this->part('message-registration-status-table');
             }
+        });
+
+        $app->hook('app.init:after', function () use($app) {
+            $app->hook('component(opportunity-phases-timeline).registration:end', function () {
+                $registration = $this->controller->requestedEntity;
+                if($registration->canUser('sendClaimMessage')){
+                    $this->part('opportunity-claim-form-component');
+                }
+            });
         });
     }
 
