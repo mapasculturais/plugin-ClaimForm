@@ -88,10 +88,10 @@ app.component('opportunity-claim-form', {
             return this.entity.opportunity.claimTo.date('numeric year') +" "+ this.entity.opportunity.claimTo.time('long');
         },
         filesSample() {
-            return this.entity.opportunity.files?.[this.groupFileSample] || [];
+            return this.entity.opportunity.files?.[this.groupFileSample] || null;
         },
         filesUpload(){
-            return this.entity.files?.[this.groupFileUpload] || [];
+            return this.entity.files?.[this.groupFileUpload] || null;
         }
     },
 });
