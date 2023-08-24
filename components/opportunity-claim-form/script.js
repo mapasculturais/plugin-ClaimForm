@@ -59,10 +59,6 @@ app.component('opportunity-claim-form', {
                 this.close(modal);
             });
         },
-        setFile() {
-            this.newFile = this.$refs.file.files[0]
-            this.upload();
-        },
         upload() {
             let data = {
                     group: this.groupFileUpload,
