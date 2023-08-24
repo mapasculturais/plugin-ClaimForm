@@ -28,6 +28,15 @@ app.component('opportunity-claim-form', {
     },
     
     methods: {
+        acceptClaim() {
+            this.entity.acceptClaim = true;
+            this.entity.save();
+        },
+        refuseClaim (){
+            this.entity.files?.[this.groupFileUpload].delete();
+            this.entity.acceptClaim = false;
+            this.entity.save();
+        },
         close(modal) {
             this.claim.message = '';
             modal.close();
