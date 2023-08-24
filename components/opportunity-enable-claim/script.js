@@ -14,10 +14,10 @@ app.component('opportunity-enable-claim', {
     data() {
         let isActiveClaim = this.entity.claimDisabled === "1" ? true : false;
         let activateAttachment = this.entity.activateAttachment === "1" ? true : false;
-        group = "formClaimUploadSample";
+        groupFileSample = "formClaimUploadSample";
 
         return {
-            group,
+            groupFileSample,
             isActiveClaim,
             activateAttachment,
             timeOut: null,
@@ -49,7 +49,7 @@ app.component('opportunity-enable-claim', {
         },
         upload() {
             let data = {
-                group: this.group,
+                group: this.groupFileSample,
                 description: this.newFile.description
             };
 
@@ -64,13 +64,11 @@ app.component('opportunity-enable-claim', {
                 this.timeout = setTimeout(()=>{
                     this.entity.save();
             },1500);
-        }
+        },
     },
     computed: {
-        files() {
-        console.log(this.entity.files);
-
-            return this.entity.files?.[this.group] || []
+        filesSample() {
+            return this.entity.files?.[this.groupFileSample] || []
         }
         
     }
