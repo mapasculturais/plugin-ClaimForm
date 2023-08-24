@@ -8,7 +8,7 @@
 use MapasCulturais\i;
 
 $this->import('
-    entity-field
+    entity-files-list
     mc-icon
     mc-link
     mc-modal
@@ -45,15 +45,7 @@ $this->import('
             <div v-if="activateAttachment">
                 <h4><?php i::_e('Envie um modelo de documento que deve ser anexado pelos solicitantes') ?></h4>
                 <div>
-                    <input type="file" name="formClaimUploadSample" @change="setFile" ref="file">
-                </div>
-                <div v-if="files">
-                    <ul>
-                        <li>
-                           <a :href="files.url" target="_blank"> {{files.name}}</a>
-                            <a href=""><mc-icon name="delete"></mc-icon> <?= i::_e('Deletar') ?></a>
-                        </li>
-                    </ul>
+                    <entity-files-list :entity="entity" group="formClaimUploadSample" title="" editable></entity-files-list>
                 </div>
             </div>
         </div>
