@@ -72,6 +72,12 @@ app.component('opportunity-claim-form', {
     },
 
     computed: {
+        isAdmin(){
+            return $MAPAS.config.opportunityClaimForm.isAdmin;
+        },
+        canManipulate(){
+            return $MAPAS.config.opportunityClaimForm.canManipulate;
+        },
         modalTitle() {
             return this.text('Solicitar Recurso');
         },
