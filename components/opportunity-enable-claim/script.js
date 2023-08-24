@@ -38,7 +38,7 @@ app.component('opportunity-enable-claim', {
     },
     methods: {
         setFile() {
-            this.newFile = this.$refs.file.files[0];
+            this.newFile = this.$refs.fileSample.files[0];
             this.upload();
         },
         isActive(active) {
