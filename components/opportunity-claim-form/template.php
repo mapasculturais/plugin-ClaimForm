@@ -17,10 +17,12 @@ $this->import('
 <div v-if="isActive() && !isAdmin">
     <mc-modal :title="modalTitle" classes="opportunity-claim-form" button-classes="opportunity-claim-form__buttonlabel">
         <template #default>
-            <div v-if="filesUpload">
-                <entity-files-list :entity="entity" group="formClaimUpload" title="<?php i::_e('Anexar documento') ?>" :editable="canManipulate"></entity-files-list>
+            <div>
+                <input type="file" @change="setFile" ref="fileUpload"> 
+                <a href="">{{entity.files[groupFileUpload]?.name}}</a>
+                <button @click="deleteFile()"><?php i::_e('Deletar') ?></button>
             </div>
-            <div v-if="filesSample.url">
+            <div v-if="filesSample">
                 <ul>
                     <li>
                         <a :href="filesSample.url" target="_blank" download><?php i::_e('Baixe o arquivo modelo para o anexo') ?> <mc-icon name="download"></mc-icon></a>

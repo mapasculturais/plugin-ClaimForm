@@ -28,7 +28,7 @@ app.component('opportunity-claim-form', {
     },
     
     methods: {
-        acceptClaim() {
+       async acceptClaim() {
             this.entity.acceptClaim = true;
             this.entity.save();
         },
@@ -51,23 +51,47 @@ app.component('opportunity-claim-form', {
             }
             return true;
         },
-        async sendClain(modal) {
-            let api = new API();
+        sendClain(modal) {
+            let data = {
+                group: this.groupFileUpload,
+                description: this.claim.message
+            };
+
+            const messages = useMessages();
+
+            const api = new API('registration');
             let url = Utils.createUrl('opportunity', 'sendOpportunityClaimMessage');
-            await api.POST(url, this.claim).then(data => {
-                this.messages.success(this.text('Solicitação de recurso enviada'));
-                this.close(modal);
+            
+            this.entity.upload(this.newFile, data).then((response) => {
+                this.claim.fileId = response.id;
+                api.POST(url, this.claim).then(res => res.json()).then(response => {
+                    if(response.error){
+                        response.data.forEach(element => {
+                            messages.error(element); 
+                        });
+                    }else{
+                    this.messages.success(this.text('Solicitação de recurso enviada'));
+                    this.close(modal);
+                    }
+                });
             });
         },
-        upload() {
+        setFile() {
+            this.newFile = this.$refs.fileUpload.files[0];
+        },
+        async upload() {
             let data = {
                     group: this.groupFileUpload,
                     description: this.newFile.description
                 };
-            this.entity.upload(this.newFile, data).then((response) => {
-                    // console.log(response)
+                
+            await this.entity.upload(this.newFile, data).then((response) => {
+                this.claim.fileId = response.id;
             });
             return true;
+        },
+        deleteFile(){
+            this.entity.files[this.groupFileUpload].delete();
         },
     },
 

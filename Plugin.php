@@ -105,6 +105,17 @@ class Plugin extends \MapasCulturais\Plugin
             $self->sendMailClaimCertificate($this);
         });
 
+        $app->hook('POST(opportunity.sendOpportunityClaimMessage)', function() use($app, $self) {
+            if($erros = $self->validateErros($this)){
+                $this->errorJson($erros);
+            }else{
+                $file = $app->repo('file')->find($this->data['fileId']);
+                $self->sendMailClaim($file);
+                $self->sendMailClaimCertificate($file);
+            }
+           
+        });
+
         // adiciona o botão de recurso na lista de
         $app->hook("template(opportunity.<<*>>.user-registration-table--registration--status):end", function ($registration, $opportunity) {
             if ($registration->canUser('sendClaimMessage')) {
@@ -121,6 +132,25 @@ class Plugin extends \MapasCulturais\Plugin
             });
         });
     }
+
+    public function validateErros($controller)
+    {
+
+        $checkFields = [
+            'message' => i::__('Digite um texto explicando seu recurso'), 
+            'fileId' => i::__('Anexe um arquivo')
+        ];
+
+        $errors = [];
+        foreach($checkFields as $field => $message){
+            if(empty($controller->data[$field]) || $controller->data[$field] == ""){
+                $errors[] = $message;
+            }
+        }
+
+        return $errors;
+    }
+    
 
     public function register()
     {
