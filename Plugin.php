@@ -31,23 +31,6 @@ class Plugin extends \MapasCulturais\Plugin
 
         $self = $this;
 
-        $app->hook('GET(registration.acceptClaim)', function () use ($app) {
-            $this->requireAuthentication();
-
-            if ($app->user->is('admin')) {
-                $file = $app->repo('file')->find($this->data['id']);
-                $registration = $file->owner;
-
-                $app->disableAccessControl();
-                $registration->acceptClaim = true;
-                $registration->save(true);
-                $app->enableAccessControl();
-
-                $url = $app->createUrl('inscricao');
-                $app->redirect($url . "/" . $registration->id);
-            }
-        });
-
         $app->hook("entity(RegistrationFile).remove:after", function() use ($app){
             if ($this->group === "formClaimUpload"){
                 $registration = $this->owner;
@@ -84,43 +67,10 @@ class Plugin extends \MapasCulturais\Plugin
             }
         });
 
-        /** Coloca o template do recurso dentro da tela de inscrição */
-        $app->hook('template(registration.view.registration-sidebar-rigth):end', function () use ($app, $self) {
-            /** @var Theme $this */
-            $this->enqueueStyle('app', 'claim-form-css', 'css/claim-form.css');
-            $app->view->jsObject['angularAppDependencies'][] = 'ng.claim-form';
-            $app->view->enqueueScript('app', 'ng.claim-form', 'js/ng.claim-form.js');
-
-            $registration = $this->controller->requestedEntity;
-            if ($registration->canUser('sendClaimMessage')) {
-                $canManipulate = $self->canManipulate($registration);
-                $claim_open = $self->claimOpen($registration);
-                $this->part('claim-form-upload', ['entity' => $registration, 'canManipulate' => $canManipulate, 'claim_open' => $claim_open]);
-            };
-        });
-
         /** Envia o e-mail de recurso para o administrador */
         $app->hook('entity(Registration).file(formClaimUpload).insert:after', function ($args) use ($self) {
             $self->sendMailClaim($this);
             $self->sendMailClaimCertificate($this);
-        });
-
-        $app->hook('POST(opportunity.sendOpportunityClaimMessage)', function() use($app, $self) {
-            if($erros = $self->validateErros($this)){
-                $this->errorJson($erros);
-            }else{
-                $file = $app->repo('file')->find($this->data['fileId']);
-                $self->sendMailClaim($file);
-                $self->sendMailClaimCertificate($file);
-            }
-           
-        });
-
-        // adiciona o botão de recurso na lista de
-        $app->hook("template(opportunity.<<*>>.user-registration-table--registration--status):end", function ($registration, $opportunity) {
-            if ($registration->canUser('sendClaimMessage')) {
-                $this->part('message-registration-status-table');
-            }
         });
 
         $app->hook('app.init:after', function () use($app) {
