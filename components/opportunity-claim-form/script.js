@@ -11,6 +11,10 @@ app.component('opportunity-claim-form', {
             type: Entity,
             required: true
         },
+        phase: {
+            type: Entity,
+            required: true
+        }
     },
 
     data() {
