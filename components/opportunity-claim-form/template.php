@@ -72,3 +72,4 @@ $this->import('
             <button class="button button--primary" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
         </div>
     </div>
+</template>
