@@ -6,6 +6,7 @@ use DateTime;
 use MapasCulturais\i;
 use MapasCulturais\App;
 use MapasCulturais\Definitions\FileGroup;
+use MapasCulturais\Entities\Notification;
 
 class Plugin extends \MapasCulturais\Plugin
 {
@@ -31,12 +32,20 @@ class Plugin extends \MapasCulturais\Plugin
 
         $self = $this;
 
-        $app->hook("entity(RegistrationFile).remove:after", function() use ($app){
+        $app->_config['mailer.templates']['claim_refused'] = [
+            'title' => i::__("Arquivo de recurso rejeitado"),
+            'template' => 'claim_refused.html'
+        ];
+
+        $app->hook("entity(RegistrationFile).remove:after", function() use ($app, $self){
             if ($this->group === "formClaimUpload"){
                 $registration = $this->owner;
                 $app->disableAccessControl();
                 $registration->acceptClaim = false;
                 $registration->save(true);
+                $message = sprintf(i::__("O arquivo anexado ao recurso da sua inscrição %s na oportunidade %s foi rejeitado."),$registration->number, $registration->opportunity->firstPhase->name);
+                $self->createNotification($registration->owner->user, $message);
+                $self->sendMailRefusedClaim($registration, $message);
                 $app->enableAccessControl();
             }
         });
@@ -182,6 +191,43 @@ class Plugin extends \MapasCulturais\Plugin
             )
         );
     }
+
+    public function createNotification($user, $message)
+    {
+        $message = $message;
+        $notification = new Notification;
+        $notification->user = $user;
+        $notification->message = $message;
+        $notification->save(true);
+    }
+    
+    public function sendMailRefusedClaim($registration, $message)
+    {
+        /** @var App $app */
+        $app = App::i();
+
+        $opportunity = $registration->opportunity;
+
+        $dataValue = [
+            'message' => $message,
+            'userName' => $registration->owner->name,
+        ];
+
+        $message = $app->renderMailerTemplate('claim_refused', $dataValue);
+
+        if (array_key_exists('mailer.from', $app->config) && !empty(trim($app->config['mailer.from']))) {
+            /*
+             * Envia e-mail para o administrador da Oportunidade
+             */
+            $app->createAndSendMailMessage([
+                'from' => $app->config['mailer.from'],
+                'to' => $registration->owner->emailPrivado,
+                'subject' => $message['title'],
+                'body' => $message['body']
+            ]);
+        }
+    }
+    
 
     public function sendMailClaim($entity)
     {
