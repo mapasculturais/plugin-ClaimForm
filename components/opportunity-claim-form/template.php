@@ -25,8 +25,8 @@ $this->import('
             </div>
 
             <div>
-                <span v-if="entity.acceptClaim"><?php i::_e('O recurso foi aceito') ?></span>
-                <span v-if="!entity.acceptClaim"><?php i::_e('O recurso esta pendente de análise') ?></span>
+                <span v-if="entity.acceptClaim"><?php i::_e('Arquivo aceito') ?></span>
+                <span v-if="!entity.acceptClaim"><?php i::_e('Arquivo em analise') ?></span>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@ $this->import('
         <entity-file :entity="entity" groupName="formClaimUpload" title="<?php i::_e('Arquivo de recurso anexado') ?>"></entity-file>
     </div>
     <div>
-        <button class="button button--primary" v-if="!entity.acceptClaim" @click="acceptClaim()"><?php i::_e('Aceitar recurso') ?></button>
-        <button class="button button--primary" @click="refuseClaim()"><?php i::_e('Rejeitar recurso') ?></button>
+        <button class="button button--primary" v-if="!entity.acceptClaim" @click="acceptClaim()"><?php i::_e('Aceitar arquivo') ?></button>
+        <button class="button button--primary" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
     </div>
 </div>
