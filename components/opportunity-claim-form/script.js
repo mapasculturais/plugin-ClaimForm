@@ -51,31 +51,6 @@ app.component('opportunity-claim-form', {
             }
             return true;
         },
-        sendClain(modal) {
-            let data = {
-                group: this.groupFileUpload,
-                description: this.claim.message
-            };
-
-            const messages = useMessages();
-
-            const api = new API('registration');
-            let url = Utils.createUrl('opportunity', 'sendOpportunityClaimMessage');
-            
-            this.entity.upload(this.newFile, data).then((response) => {
-                this.claim.fileId = response.id;
-                api.POST(url, this.claim).then(res => res.json()).then(response => {
-                    if(response.error){
-                        response.data.forEach(element => {
-                            messages.error(element); 
-                        });
-                    }else{
-                    this.messages.success(this.text('Solicitação de recurso enviada'));
-                    this.close(modal);
-                    }
-                });
-            });
-        },
         setFile() {
             this.newFile = this.$refs.fileUpload.files[0];
         },
