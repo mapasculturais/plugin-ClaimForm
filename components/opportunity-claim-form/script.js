@@ -28,6 +28,18 @@ app.component('opportunity-claim-form', {
     },
     
     methods: {
+        shouldShowClaim() {
+			// se é uma fase de avaliação que não tem uma fase de coleta de dados anterior
+			const isEvaluation = this.phase.__objectType == 'evaluationmethodconfiguration';
+
+			// se é uma fase de coleta de dados que não tem uma fase de avaliação posterior
+			const isRegistrationOnly = this.phase.__objectType == 'opportunity' && !this.phase.evaluationMethodConfiguration;
+
+			const phaseOpportunity = this.phase.__objectType == 'opportunity' ? this.phase : this.phase.opportunity;
+
+			return phaseOpportunity.publishedRegistrations && (isRegistrationOnly || isEvaluation);
+		
+		},
        async acceptClaim() {
             this.entity.acceptClaim = true;
             this.entity.save();
