@@ -8,53 +8,36 @@
 use MapasCulturais\i;
 
 $this->import('
-    entity-files-list
+    entity-file
     mc-container
     mc-modal
     mc-icon
 ');
 ?>
 <div v-if="isActive() && !isAdmin">
-    <mc-modal :title="modalTitle" classes="opportunity-claim-form" button-classes="opportunity-claim-form__buttonlabel">
-        <template #default>
+    <div>
+        <entity-file :entity="entity" groupName="formClaimUpload" title="" :editable="!entity.acceptClaim" enableDescription></entity-file>
+        
+        <div v-if="filesUpload">
             <div>
-                <input type="file" @change="setFile" ref="fileUpload"> 
-                <a href="">{{entity.files[groupFileUpload]?.name}}</a>
-                <button @click="deleteFile()"><?php i::_e('Deletar') ?></button>
-            </div>
-            <div v-if="filesSample">
-                <ul>
-                    <li>
-                        <a :href="filesSample.url" target="_blank" download><?php i::_e('Baixe o arquivo modelo para o anexo') ?> <mc-icon name="download"></mc-icon></a>
-                    </li>
-                </ul>
+                <strong><?php i::_e('Motivo do recurso') ?></strong>
+                <p>{{filesUpload.description}}</p>
             </div>
 
-            <div class="opportunity-claim-form__content">
-                <h5 class="semibold opportunity-claim-form__label"><?php i::_e('Descreva abaixo os motivos do recurso') ?></h5>
-                <textarea v-model="claim.message" id="message" class="opportunity-claim-form__textarea"></textarea>
-            </div>
-        </template>
-        <template #actions="modal">
-            <button class="button button--text delete-registration " @click="close(modal)"><?php i::_e('Cancelar') ?></button>
-            <button class="button button--primary" @click="sendClain(modal)"><?php i::_e('Solicitar') ?></button>
-        </template>
-        <template #button="modal">
-            <h5 class="opportunity-claim-form__resource bold"><?php i::_e('Discorda do resultado?') ?></h5>
             <div>
-                <?php i::_e('Período do recurso de recurso'); ?> {{claimFromDate}} a {{claimclaimTo}}
+                <span v-if="entity.acceptClaim"><?php i::_e('O recurso foi aceito') ?></span>
+                <span v-if="!entity.acceptClaim"><?php i::_e('O recurso esta pendente de análise') ?></span>
             </div>
-            <button class="button button--primary-outline" @click="open(modal)"><?php i::_e('Solicitar Recurso') ?></button>
-        </template>
-    </mc-modal>
+        </div>
+    </div>
 </div>
 
 <div v-if="filesUpload && isActive() && isAdmin">
     <div>
-        <entity-files-list :entity="entity" group="formClaimUpload" title="<?php i::_e('Arquivo de recurso anexado') ?>"></entity-files-list>
+        <entity-file :entity="entity" groupName="formClaimUpload" title="<?php i::_e('Arquivo de recurso anexado') ?>"></entity-file>
     </div>
     <div>
-        <button class="button button--primary" v-if="!entity.acceptClaim" @click="acceptClaim()"><?php i::_e('Aceitar arquivo') ?></button>
-        <button class="button button--primary" @click="refuseClaim()"><?php i::_e('Recusar arquivo') ?></button>
+        <button class="button button--primary" v-if="!entity.acceptClaim" @click="acceptClaim()"><?php i::_e('Aceitar recurso') ?></button>
+        <button class="button button--primary" @click="refuseClaim()"><?php i::_e('Rejeitar recurso') ?></button>
     </div>
 </div>

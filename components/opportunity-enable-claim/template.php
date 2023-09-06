@@ -8,7 +8,7 @@
 use MapasCulturais\i;
 
 $this->import('
-    entity-files-list
+    entity-file
     mc-icon
     mc-link
     mc-modal
@@ -43,7 +43,7 @@ $this->import('
                 <div>
                     <h4><?php i::_e('Envie um modelo de documento que deve ser anexado pelos solicitantes') ?></h4>
                     <div>
-                        <entity-files-list :entity="entity" group="formClaimUploadSample" title="" editable></entity-files-list>
+                        <entity-file :entity="entity" groupName="formClaimUploadSample" title="" editable></entity-file>
                     </div>
                 </div>
             </div>
