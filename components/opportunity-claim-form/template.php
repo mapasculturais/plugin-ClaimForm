@@ -15,35 +15,39 @@ $this->import('
 ');
 ?>
 <template v-if="shouldShowClaim()">
-    <div v-if="isActive() && !isAdmin">
-        <div>
+    <div v-if="isActive() && !isAdmin" class="claim-form">
+        <div class="claim-form__content">
             <h5 class="opportunity-claim-form__resource bold"><?php i::_e('Discorda do resultado?') ?></h5>
+            <label></label>
             <entity-file :entity="entity" groupName="formClaimUpload" title="" :editable="!entity.acceptClaim" enableDescription disableName>
-                <template #button="popover">
-                    <a v-if="!popover.file" @click="popover.toggle()" class="button button--primary button--icon button--primary-outline button-up">
-                        <mc-icon name="upload"></mc-icon>
-                        <?php i::_e("Solicitar recurso") ?>
-                    </a>
-
-                    <a v-if="popover.file" @click="popover.toggle()" class="button button--primary button--icon button--primary-outline button-up">
-                        <mc-icon name="upload"></mc-icon>
-                        <?php i::_e("Editar solicitação") ?>
-                    </a>
+                <template #label>
+                    <?php i::_e("Baixar recurso anexado") ?>
+                </template>
+                <template #button="{open, close, toggle, file}">
+                        <a v-if="!file" @click="toggle()" class="button button--primary button--icon button--primary-outline button-up">
+                            <mc-icon name="upload"></mc-icon>
+                            <?php i::_e("Solicitar recurso") ?>
+                        </a>
+                        <a v-if="file" @click="toggle()" class="button button--primary button--icon button--primary-outline button-up">
+                            <mc-icon name="upload"></mc-icon>
+                            <?php i::_e("Editar solicitação") ?>
+                        </a>
                 </template>
 
-                <template #form="{enableDescription, disableName, formData, setFile}">
-                    <div class="col-6">
-                        <div class="field">
-                            <label><?php i::_e('Arquivo') ?></label>
-                            <input type="file" @change="setFile($event)" ref="file">
+                <template #form="{enableDescription, disableName, formData, setFile, file}">
+                    <div class="col-12 opportunity-claim-form__files">
+                        <div class="field__upload">
+                            <div v-if="file.name" class="entity-file__fileName primary__color bold"> {{file.name}} </div>
+                            <label for="newFile" class="field__buttonUpload button button--icon button--primary-outline">
+                                <mc-icon name="upload"></mc-icon> <?= i::__('Arquivo') ?>
+                                <input id="newFile" type="file" @change="setFile($event)" ref="file">
+                            </label>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <entity-file :entity="entity.opportunity" groupName="formClaimUploadSample"></entity-file>
+                        <entity-file :entity="entity.opportunity" downloadOnly groupName="formClaimUploadSample"></entity-file>
                     </div>
 
-                    <div v-if="enableDescription" class="col-12">
-                        <label><?php i::_e('Descreva abaixo os motivos do recurso') ?></label><br>
+                    <div v-if="enableDescription" class="field col-12">
+                        <label><?php i::_e('Descreva abaixo os motivos do recurso') ?></label>
                         <textarea v-model="formData.description"></textarea>
                     </div>
                 </template>
@@ -56,8 +60,8 @@ $this->import('
                 </div>
 
                 <div>
-                    <span v-if="entity.acceptClaim"><?php i::_e('Arquivo aceito') ?></span>
-                    <span v-if="!entity.acceptClaim"><?php i::_e('Arquivo em analise') ?></span>
+                    <span v-if="entity.acceptClaim" class="success__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo aceito') ?></span>
+                    <span v-if="!entity.acceptClaim" class="helper__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo em analise') ?></span>
                 </div>
             </div>
         </div>
@@ -67,9 +71,9 @@ $this->import('
         <div>
             <entity-file :entity="entity" groupName="formClaimUpload" title="<?php i::_e('Arquivo de recurso anexado') ?>"></entity-file>
         </div>
-        <div>
+        <div class="opportunity-claim-form__btn">
             <button class="button button--primary" v-if="!entity.acceptClaim" @click="acceptClaim()"><?php i::_e('Aceitar arquivo') ?></button>
-            <button class="button button--primary" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
+            <button class="button button--primary-outline" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
         </div>
     </div>
 </template>
