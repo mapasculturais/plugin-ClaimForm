@@ -30,8 +30,12 @@ class Plugin extends \MapasCulturais\Plugin
         /** @var App $app */
         $app = App::i();
 
-        $self = $this;
+        //load css
+        $app->hook('GET(<<*>>.<<*>>)', function() use ($app) {
+            $app->view->enqueueStyle('app-v2', 'ClaimForm', 'css/plugin-claim-form.css');
+        });
 
+        $self = $this;
         $app->_config['mailer.templates']['claim_refused'] = [
             'title' => i::__("Arquivo de recurso rejeitado"),
             'template' => 'claim_refused.html'
