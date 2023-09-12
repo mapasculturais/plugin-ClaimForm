@@ -69,7 +69,9 @@ $this->import('
 
     <div v-if="filesUpload && isActive() && isAdmin">
         <div>
-            <entity-file :entity="entity" groupName="formClaimUpload" title="<?php i::_e('Arquivo de recurso anexado') ?>"></entity-file>
+            <entity-file :entity="entity" groupName="formClaimUpload" title="">
+                <template #label><?php i::_e('Arquivo de recurso anexado') ?></template>
+            </entity-file>
         </div>
         <div class="opportunity-claim-form__btn">
             <button class="button button--primary" v-if="!entity.acceptClaim" @click="acceptClaim()"><?php i::_e('Aceitar arquivo') ?></button>
