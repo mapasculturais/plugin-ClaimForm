@@ -23,10 +23,8 @@
     }
 
     &__input {
-        display: flex;
-        flex-direction: row;
-        gap: size(6);
-        padding-bottom: size(17);
+      
+        padding: 0 0 size(15);
 
         input[type="checkbox"] {
             width: size(16);
