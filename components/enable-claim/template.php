@@ -40,15 +40,14 @@ $this->import('
                     <input type="text" v-model="entity.claimEmail" @change="autoSave()" />
                 </div>
             </div>
-            <div class="field">
-                <label for="resource">
-                    <input type="checkbox" v-model="activateAttachment" @change="autoSave()" />
-                    <?= i::__("Habilitar anexo de arquivo para recurso") ?>
-                </label>
-            </div>
-            <div v-if="activateAttachment">
+            <div>
                 <label class="opportunity-enable-claim__send"><?php i::_e('Envie um modelo de documento que deve ser anexado pelos solicitantes') ?></label>
-                <entity-file :entity="entity" groupName="formClaimUploadSample" title="" editable></entity-file>
+                <entity-file :entity="entity" groupName="formClaimUploadSample" title="" editable titleModal="<?= i::__("Configurar arquivo de exemplo") ?>">
+                    <template #modal-actions>
+                        <button class="col-6 button button--text" type="reset" @click="modal.close()"> <?php i::_e("Cancelar") ?> </button>
+                        <button class="col-6 button button--primary" type="submit" @click="upload(modal); $event.preventDefault();"> <?php i::_e("Enviar") ?> </button>
+                    </template>
+                </entity-file>
             </div>
     </div>
 </div>

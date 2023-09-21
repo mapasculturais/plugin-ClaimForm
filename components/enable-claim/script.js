@@ -1,8 +1,8 @@
-app.component('opportunity-enable-claim', {
-    template: $TEMPLATES['opportunity-enable-claim'],
+app.component('enable-claim', {
+    template: $TEMPLATES['enable-claim'],
 
     setup() {
-        const text = Utils.getTexts('opportunity-enable-claim');
+        const text = Utils.getTexts('enable-claim');
         return { text };
     },
     props: {
@@ -54,7 +54,6 @@ app.component('opportunity-enable-claim', {
             };
 
             this.entity.upload(this.newFile, data).then((response) => {
-                // console.log(response)
             });
 
             return true;

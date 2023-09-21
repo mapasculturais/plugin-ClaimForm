@@ -1,8 +1,8 @@
-app.component('opportunity-claim-form', {
-    template: $TEMPLATES['opportunity-claim-form'],
+app.component('claim-form', {
+    template: $TEMPLATES['claim-form'],
     setup() {
         const messages = useMessages();
-        const text = Utils.getTexts('opportunity-claim-form')
+        const text = Utils.getTexts('claim-form')
         return { text, messages }
     },
 
@@ -33,25 +33,24 @@ app.component('opportunity-claim-form', {
     
     methods: {
         shouldShowClaim() {
-			// se é uma fase de avaliação que não tem uma fase de coleta de dados anterior
 			const isEvaluation = this.phase.__objectType == 'evaluationmethodconfiguration';
 
-			// se é uma fase de coleta de dados que não tem uma fase de avaliação posterior
 			const isRegistrationOnly = this.phase.__objectType == 'opportunity' && !this.phase.evaluationMethodConfiguration;
 
 			const phaseOpportunity = this.phase.__objectType == 'opportunity' ? this.phase : this.phase.opportunity;
 
 			return phaseOpportunity.publishedRegistrations && (isRegistrationOnly || isEvaluation);
-		
 		},
        async acceptClaim() {
-            this.entity.acceptClaim = true;
+            this.entity.acceptClaim = 1;
             this.entity.save();
+            this.reloadPage();
         },
         refuseClaim (){
             this.entity.files?.[this.groupFileUpload].delete();
-            this.entity.acceptClaim = false;
+            this.entity.acceptClaim = "";
             this.entity.save();
+            this.reloadPage();
         },
         close(modal) {
             this.claim.message = '';
@@ -84,6 +83,11 @@ app.component('opportunity-claim-form', {
         deleteFile(){
             this.entity.files[this.groupFileUpload].delete();
         },
+        reloadPage(timeout = 1500){
+            setTimeout(() => {
+                document.location.reload(true)
+            }, timeout);
+        },
     },
 
     computed: {
@@ -108,6 +112,6 @@ app.component('opportunity-claim-form', {
         filesUpload(){
             return this.entity.files?.[this.groupFileUpload] || null;
         }
-    },
+    }
 });
 

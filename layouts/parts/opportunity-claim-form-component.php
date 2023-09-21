@@ -1,5 +1,5 @@
 <?php
-$this->import('opportunity-claim-form');
+$this->import('claim-form');
 ?>
 
-<opportunity-claim-form :entity="registration" :phase="item"></opportunity-claim-form>
+<claim-form :entity="registration" :phase="item"></claim-form>

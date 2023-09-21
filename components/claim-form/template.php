@@ -19,7 +19,7 @@ $this->import('
         <div class="claim-form__content">
             <h5 class="opportunity-claim-form__resource bold"><?php i::_e('Discorda do resultado?') ?></h5>
             <label></label>
-            <entity-file :entity="entity" groupName="formClaimUpload" title="" :editable="!entity.acceptClaim" enableDescription disableName>
+            <entity-file :entity="entity" groupName="formClaimUpload" title="" :editable="!entity.acceptClaim" enableDescription disableName titleModal="<?php i::_e('Solicitar recurso') ?>">
                 <template #label>
                     <?php i::_e("Baixar recurso anexado") ?>
                 </template>

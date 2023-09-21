@@ -1,4 +1,4 @@
-# Componente `<opportunity-claim-form>`
+# Componente `<claim-form>`
 Adiciona botão para solicitação de recurso para inscrição ou fase
 
 ### Eventos
@@ -10,12 +10,12 @@ Adiciona botão para solicitação de recurso para inscrição ou fase
 ### Importando componente
 ```PHP
 <?php 
-$this->import('opportunity-claim-form');
+$this->import('claim-form');
 ?>
 ```
 ### Exemplos de uso
 ```HTML
 <!-- utilizaçao básica -->
-<opportunity-claim-form :registration="registration"></opportunity-claim-form>
+<claim-form :registration="registration"></claim-form>
 
 ```

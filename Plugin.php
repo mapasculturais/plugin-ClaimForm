@@ -81,12 +81,12 @@ class Plugin extends \MapasCulturais\Plugin
         });
 
         /** Envia o e-mail de recurso para o administrador */
-        $app->hook('entity(Registration).file(formClaimUpload).insert:after', function ($args) use ($self) {
+        $app->hook('entity(Registration).file(formClaimUpload).insert:after', function () use ($self) {
             $self->sendMailClaim($this);
             $self->sendMailClaimCertificate($this);
         });
 
-        $app->hook('app.init:after', function () use($app) {
+        $app->hook('app.plugins.preInit:before', function () use($app) {
             
             $app->hook("component(opportunity-phase-config-data-collection):bottom", function(){
                 $this->part('opportunity-claim-config');
@@ -154,7 +154,7 @@ class Plugin extends \MapasCulturais\Plugin
             'label' => \MapasCulturais\i::__('Data de inicio do recurso'),
             'type' => 'datetime',
             'unserialize' => function ($value) {
-                return new DateTime($value);
+                return $value ? new DateTime($value) : $value;
             }
         ]);
 
@@ -162,14 +162,20 @@ class Plugin extends \MapasCulturais\Plugin
             'label' => \MapasCulturais\i::__('Data de fim do recurso'),
             'type' => 'datetime',
             'unserialize' => function ($value) {
-                return new DateTime($value);
+                return $value ? new DateTime($value) : $value;
             }
         ]);
 
         $this->registerRegistrationMetadata('acceptClaim', [
             'label' => \MapasCulturais\i::__('Idicação de aceite do recurso por parte do administrador'),
             'type' => 'bool',
-            'default' => false
+            'default' => false,
+            'serialize' => function($value){
+                return $value == 1 ? true : false;
+            },
+            'unserialize' => function($value){
+                return $value == 1 ? true : false;
+            }
         ]);
 
         $app->registerFileGroup(
