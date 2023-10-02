@@ -27,7 +27,7 @@ $accept_claim_url = $app->createUrl("registration", 'acceptClaim');
         <br>
     </div>
 
-    <edit-box id="form-claim" position="bottom" cancel-label="<?php i::esc_attr_e("Cancelar"); ?>" submit-label="<?php i::esc_attr_e("Enviar recurso"); ?>" loading-label="<?php i::esc_attr_e("Carregando ..."); ?>" on-submit="sendClaim" close-on-cancel='true' index="{{$index}}" spinner-condition="data.uploadSpinner">
+    <edit-box id="form-claim" position="left" cancel-label="<?php i::esc_attr_e("Cancelar"); ?>" submit-label="<?php i::esc_attr_e("Enviar recurso"); ?>" loading-label="<?php i::esc_attr_e("Carregando ..."); ?>" on-submit="sendClaim" close-on-cancel='true' index="{{$index}}" spinner-condition="data.uploadSpinner">
         <form id="send-clain-form" class="js-ajax-upload" method="post" action="<?= $url ?>" data-group="formClaimUpload" enctype="multipart/form-data">
             <div>
                 <?php i::_e("Mensagem"); ?>:<br />
