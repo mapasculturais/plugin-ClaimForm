@@ -258,9 +258,10 @@ class Plugin extends \MapasCulturais\Plugin
             /*
              * Envia e-mail para o administrador da Oportunidade
              */
+            $email = $registration->owner->emailPrivado ?: $registration->owner->emailPublico ?: $registration->owner->user->email;
             $app->createAndSendMailMessage([
                 'from' => $app->config['mailer.from'],
-                'to' => $registration->owner->emailPrivado,
+                'to' =>  $email,
                 'subject' => $message['title'],
                 'body' => $message['body']
             ]);
