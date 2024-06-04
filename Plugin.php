@@ -154,7 +154,7 @@ class Plugin extends \MapasCulturais\Plugin
             'label' => \MapasCulturais\i::__('Data de inicio do recurso'),
             'type' => 'datetime',
             'unserialize' => function ($value) {
-                return $value ? new DateTime($value) : $value;
+                return $value ? new DateTime($value ?: 'now') : $value;
             }
         ]);
 
@@ -162,7 +162,7 @@ class Plugin extends \MapasCulturais\Plugin
             'label' => \MapasCulturais\i::__('Data de fim do recurso'),
             'type' => 'datetime',
             'unserialize' => function ($value) {
-                return $value ? new DateTime($value) : $value;
+                return $value ? new DateTime($value ?: 'now') : $value;
             }
         ]);
 
