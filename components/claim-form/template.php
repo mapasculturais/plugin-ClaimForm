@@ -15,7 +15,7 @@ $this->import('
 ');
 ?>
 <template v-if="shouldShowClaim()">
-    <div v-if="isActive() && !isAdmin" class="claim-form">
+    <div v-if="canManipulate && isActive() && !isAdmin" class="claim-form">
         <div class="claim-form__content">
             <h5 class="opportunity-claim-form__resource bold"><?php i::_e('Discorda do resultado?') ?></h5>
             <label></label>
