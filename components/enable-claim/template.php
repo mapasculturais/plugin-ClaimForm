@@ -29,8 +29,8 @@ $this->import('
     </div>
     <div class="opportunity-enable-claim__content" v-if="isActiveClaim">
             <div class="grid-12">
-                <entity-field :entity="entity" classes="col-3 sm:col-12" prop="claimFrom"></entity-field>
-                <entity-field :entity="entity" classes="col-3 sm:col-12" prop="claimTo"></entity-field>
+                <entity-field :entity="entity" classes="col-6 sm:col-12" prop="claimFrom" :autosave='300'></entity-field>
+                <entity-field :entity="entity" classes="col-6 sm:col-12" prop="claimTo" :autosave='300'></entity-field>
             </div>
             <div class="opportunity-enable-claim__email">
                 <label class="opportunity-enable-claim__label" for="input">

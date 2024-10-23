@@ -182,9 +182,34 @@ class Plugin extends \MapasCulturais\Plugin
             'registration',
             new FileGroup(
                 'formClaimUpload',
-                ['^application/pdf'],
-                'O arquivo não é valido',
-                true
+                [
+                    'application/pdf',
+                    'image/(gif|jpeg|pjpeg|png)',
+    
+                    // ms office
+                    'application/msword',
+                    'application/vnd\.openxmlformats-officedocument\.wordprocessingml\.document',
+                    'application/vnd\.ms-excel',
+                    'application/vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet',
+                    'application/vnd\.ms-powerpoint',
+                    'application/vnd\.openxmlformats-officedocument\.presentationml\.presentation',
+                    'application/vnd\.openxmlformats-officedocument\.presentationml\.slideshow',
+    
+                    // libreoffice / openoffice
+                    'application/vnd\.oasis\.opendocument\.chart',
+                    'application/vnd\.oasis\.opendocument\.formula',
+                    'application/vnd\.oasis\.opendocument\.graphics',
+                    'application/vnd\.oasis\.opendocument\.image',
+                    'application/vnd\.oasis\.opendocument\.presentation',
+                    'application/vnd\.oasis\.opendocument\.spreadsheet',
+                    'application/vnd\.oasis\.opendocument\.text',
+                    'application/vnd\.oasis\.opendocument\.text-master',
+                    'application/vnd\.oasis\.opendocument\.text-web',
+                ],
+                'O arquivo não é um documento válido, verifique o tipo de arquivo.',
+                true,
+                private: true
+
             )
         );
 
@@ -201,8 +226,8 @@ class Plugin extends \MapasCulturais\Plugin
                     'application/x-abiword',
                     'application/msword'
                 ],
-                'O arquivo não é valido',
-                true
+                'O arquivo não é válido',
+                true,
             )
         );
     }

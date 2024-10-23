@@ -20,11 +20,11 @@ app.component('claim-form', {
     data() {
         groupFileSample = "formClaimUploadSample";
         groupFileUpload = "formClaimUpload";
-        newFile = {};
         return {
             groupFileSample,
             groupFileUpload,
-            newFile,
+            newFile: null,
+            uploadedFile: null,
             claim: {
                 registration_id: $MAPAS.config.opportunityClaimForm.registrationId
             },
@@ -66,19 +66,12 @@ app.component('claim-form', {
             }
             return true;
         },
-        setFile() {
-            this.newFile = this.$refs.fileUpload.files[0];
+        setFile($event) {
+            this.newFile = $event;
+            this.entity.files[this.groupFileUpload] = this.newFile;
         },
-        async upload() {
-            let data = {
-                    group: this.groupFileUpload,
-                    description: this.newFile.description
-                };
-                
-            await this.entity.upload(this.newFile, data).then((response) => {
-                this.claim.fileId = response.id;
-            });
-            return true;
+        uploaded($event) {
+            this.uploadedFile = $event;
         },
         deleteFile(){
             this.entity.files[this.groupFileUpload].delete();
@@ -108,9 +101,6 @@ app.component('claim-form', {
         },
         filesSample() {
             return this.entity.opportunity.files?.[this.groupFileSample] || null;
-        },
-        filesUpload(){
-            return this.entity.files?.[this.groupFileUpload] || null;
         }
     }
 });

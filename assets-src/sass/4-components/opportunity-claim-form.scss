@@ -1,6 +1,7 @@
 @use '../2-atoms/a-mixins' as *;
 
 .opportunity-claim-form {
+
     &__buttonlabel {
       max-width: size(259);
       width: 100%;
@@ -31,9 +32,25 @@
         padding-top: size(15);
     }
 
+    &__description {
+      white-space: pre-line;
+    }
+
+    .entity-file {
+      gap:0;
+      &__label {
+        font-size: 16px;
+        font-weight: bold;
+      }
+    }
+
     .modal {
       max-width: 570px;
       width: 100%;
+
+      &__header {
+        padding: 0 !important;
+      }
   
       &__title {
         font-family: 'Open Sans';
@@ -65,5 +82,13 @@
         }
   
       }
+    }
+  }
+
+  .claim-form {
+    &__content {
+      border-radius: 0.25rem;
+      border: 1px solid var(--mc-gray-300);
+      padding: 0.5rem 0 0.5rem 0.5rem;
     }
   }

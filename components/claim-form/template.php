@@ -15,48 +15,63 @@ $this->import('
 ');
 ?>
 <template v-if="shouldShowClaim()">
-    <div v-if="canManipulate && isActive() && !isAdmin" class="claim-form">
+    <div v-if="canManipulate && isActive() && !isAdmin" class="opportunity-claim-form clain-form">
         <div class="claim-form__content">
-            <h5 class="opportunity-claim-form__resource bold"><?php i::_e('Discorda do resultado?') ?></h5>
-            <label></label>
-            <entity-file :entity="entity" groupName="formClaimUpload" title="" :editable="!entity.acceptClaim" enableDescription disableName titleModal="<?php i::_e('Solicitar recurso') ?>">
+            
+            <h4 v-if="entity.files?.[groupFileUpload]" class="opportunity-claim-form__resource semibold"><?php i::_e('Recurso') ?></h4>
+            <h4 v-else class="opportunity-claim-form__resource semibold"><?php i::_e('Discorda do resultado?') ?></h4>
+            
+            <entity-file 
+                :entity="entity" 
+                group-name="formClaimUpload" 
+                title="" 
+                :editable="!entity.files?.[groupFileUpload] && !uploadedFile" 
+                title-modal="<?php i::_e('Solicitação de recurso') ?>" 
+                @set-file="setFile($event)" 
+                @uploaded="uploaded($event)"
+                enable-description disable-name >
+                
                 <template #label>
-                    <?php i::_e("Baixar recurso anexado") ?>
+                    <?php i::_e("Documento anexado:") ?>
                 </template>
                 <template #button="{open, close, toggle, file}">
                         <a v-if="!file" @click="toggle()" class="button button--primary button--icon button--primary-outline button-up">
                             <mc-icon name="upload"></mc-icon>
                             <?php i::_e("Solicitar recurso") ?>
                         </a>
-                        <a v-if="file" @click="toggle()" class="button button--primary button--icon button--primary-outline button-up">
-                            <mc-icon name="upload"></mc-icon>
-                            <?php i::_e("Editar solicitação") ?>
-                        </a>
                 </template>
 
                 <template #form="{enableDescription, disableName, formData, setFile, file}">
-                    <div class="col-12 opportunity-claim-form__files">
-                        <div class="field__upload">
-                            <div v-if="file.name" class="entity-file__fileName primary__color bold"> {{file.name}} </div>
-                            <label for="newFile" class="field__buttonUpload button button--icon button--primary-outline">
-                                <mc-icon name="upload"></mc-icon> <?= i::__('Arquivo') ?>
-                                <input id="newFile" type="file" @change="setFile($event)" ref="file">
-                            </label>
-                        </div>
-                        <entity-file :entity="entity.opportunity" downloadOnly groupName="formClaimUploadSample"></entity-file>
-                    </div>
-
                     <div v-if="enableDescription" class="field col-12">
                         <label><?php i::_e('Descreva abaixo os motivos do recurso') ?></label>
                         <textarea v-model="formData.description"></textarea>
                     </div>
+
+                    <div class="col-12 opportunity-claim-form__files grid-12">
+                        <div v-if="entity.opportunity.files.formClaimUploadSample" class="col-12 field">
+                            <label> 
+                                Utilize o modelo abaixo para o anexo:
+                            </label>
+                            <entity-file :entity="entity.opportunity" group-name="formClaimUploadSample" ></entity-file>
+                        </div>
+
+                        <div class="field__upload">
+                            <div v-if="file.name" class="entity-file__fileName primary__color bold"> {{file.name}} </div>
+                            <label for="newFile" class="field__buttonUpload button button--icon button--primary-outline">
+                                <mc-icon name="upload"></mc-icon> 
+                                <span v-if="newFile"> <?= i::__('Alterar') ?> </span>
+                                <span v-else> <?= i::__('Anexar documento') ?> </span>
+                                <input id="newFile" type="file" @change="setFile($event)" ref="file">
+                            </label>
+                        </div>
+                    </div>
                 </template>
             </entity-file>
             
-            <div v-if="filesUpload">
-                <div>
-                    <strong><?php i::_e('Motivo do recurso') ?></strong>
-                    <p>{{filesUpload.description}}</p>
+            <div v-if="entity.files?.[groupFileUpload]">
+                <div v-if="entity.files?.[groupFileUpload]?.description">
+                    <label class="bold"><?php i::_e('Motivo do recurso') ?>:</label>
+                    <p class="claim-form__description">{{entity.files?.[groupFileUpload]?.description}}</p>
                 </div>
 
                 <div>
@@ -67,7 +82,7 @@ $this->import('
         </div>
     </div>
 
-    <div v-if="filesUpload && isActive() && isAdmin">
+    <div v-if="entity.files?.[groupFileUpload] && isActive() && isAdmin">
         <div>
             <entity-file :entity="entity" groupName="formClaimUpload" title="">
                 <template #label><?php i::_e('Arquivo de recurso anexado') ?></template>
