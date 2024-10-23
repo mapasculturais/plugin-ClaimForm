@@ -6,6 +6,7 @@ use DateTime;
 use MapasCulturais\i;
 use MapasCulturais\App;
 use MapasCulturais\Definitions\FileGroup;
+use MapasCulturais\Entities\Notification;
 
 class Plugin extends \MapasCulturais\Plugin
 {
@@ -20,7 +21,7 @@ class Plugin extends \MapasCulturais\Plugin
                 unset($modules[$key]);
             }
         });
-
+        
         parent::__construct($config);
     }
 
@@ -29,31 +30,26 @@ class Plugin extends \MapasCulturais\Plugin
         /** @var App $app */
         $app = App::i();
 
-        $self = $this;
-
-        $app->hook('GET(registration.acceptClaim)', function () use ($app) {
-            $this->requireAuthentication();
-
-            if ($app->user->is('admin')) {
-                $file = $app->repo('file')->find($this->data['id']);
-                $registration = $file->owner;
-
-                $app->disableAccessControl();
-                $registration->acceptClaim = true;
-                $registration->save(true);
-                $app->enableAccessControl();
-
-                $url = $app->createUrl('inscricao');
-                $app->redirect($url . "/" . $registration->id);
-            }
+        //load css
+        $app->hook('GET(<<*>>.<<*>>)', function() use ($app) {
+            $app->view->enqueueStyle('app-v2', 'ClaimForm', 'css/plugin-claim-form.css');
         });
 
-        $app->hook("entity(RegistrationFile).remove:after", function() use ($app){
+        $self = $this;
+        $app->_config['mailer.templates']['claim_refused'] = [
+            'title' => i::__("Arquivo de recurso rejeitado"),
+            'template' => 'claim_refused.html'
+        ];
+
+        $app->hook("entity(RegistrationFile).remove:after", function() use ($app, $self){
             if ($this->group === "formClaimUpload"){
                 $registration = $this->owner;
                 $app->disableAccessControl();
                 $registration->acceptClaim = false;
                 $registration->save(true);
+                $message = sprintf(i::__("O arquivo anexado ao recurso da sua inscrição %s na oportunidade %s foi rejeitado."),$registration->number, $registration->opportunity->firstPhase->name);
+                $self->createNotification($registration->owner->user, $message);
+                $self->sendMailRefusedClaim($registration, $message);
                 $app->enableAccessControl();
             }
         });
@@ -77,46 +73,66 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('entity(Registration).canUser(sendClaimMessage)', function ($user, &$canUser) use ($self) {
             $opportunity = $this->opportunity;
             // se o status for maior que 0 significa que a inscrição foi enviada
-            if ($this->status > 0 && $opportunity->publishedRegistrations && !$opportunity->claimDisabled && $this->canUser('view')) {
+            if ($this->status > 0 && $opportunity->publishedRegistrations && $opportunity->claimDisabled && $this->canUser('view')) {
                 $canUser = true;
             } else {
                 $canUser = false;
             }
         });
 
-        /** Coloca o template do recurso dentro da tela de inscrição */
-        $app->hook('template(registration.view.registration-sidebar-rigth):end', function () use ($app, $self) {
-            /** @var Theme $this */
-            $this->enqueueStyle('app', 'claim-form-css', 'css/claim-form.css');
-            $app->view->jsObject['angularAppDependencies'][] = 'ng.claim-form';
-            $app->view->enqueueScript('app', 'ng.claim-form', 'js/ng.claim-form.js');
-
-            $registration = $this->controller->requestedEntity;
-            if ($registration->canUser('sendClaimMessage')) {
-                $canManipulate = $self->canManipulate($registration);
-                $claim_open = $self->claimOpen($registration);
-                $this->part('claim-form-upload', ['entity' => $registration, 'canManipulate' => $canManipulate, 'claim_open' => $claim_open]);
-            };
-        });
-
         /** Envia o e-mail de recurso para o administrador */
-        $app->hook('entity(Registration).file(formClaimUpload).insert:after', function ($args) use ($self) {
+        $app->hook('entity(Registration).file(formClaimUpload).insert:after', function () use ($self) {
             $self->sendMailClaim($this);
             $self->sendMailClaimCertificate($this);
         });
 
-        // adiciona o botão de recurso na lista de
-        $app->hook("template(opportunity.<<*>>.user-registration-table--registration--status):end", function ($registration, $opportunity) {
-            if ($registration->canUser('sendClaimMessage')) {
-                $this->part('message-registration-status-table');
-            }
+        $app->hook('app.plugins.preInit:before', function () use($app) {
+            
+            $app->hook("component(opportunity-phase-config-data-collection):bottom", function(){
+                $this->part('opportunity-claim-config');
+            });
+
+            $app->hook('component(opportunity-phases-timeline).registration:end', function () {
+                $registration = $this->controller->requestedEntity;
+                if($registration->canUser('sendClaimMessage')){
+                    $this->part('opportunity-claim-form-component');
+                }
+            });
         });
     }
+
+    public function validateErros($controller)
+    {
+
+        $checkFields = [
+            'message' => i::__('Digite um texto explicando seu recurso'), 
+            'fileId' => i::__('Anexe um arquivo')
+        ];
+
+        $errors = [];
+        foreach($checkFields as $field => $message){
+            if(empty($controller->data[$field]) || $controller->data[$field] == ""){
+                $errors[] = $message;
+            }
+        }
+
+        return $errors;
+    }
+    
 
     public function register()
     {
         /** @var App $app */
         $app = App::i();
+
+        $this->registerOpportunityMetadata('activateAttachment', [
+            'label' => i::__('Habilitar anexo de arquivo para recurso'),
+            'type' => 'select',
+            'options' => (object)[
+                '0' => i::__('Anexo habilitado'),
+                '1' => i::__('Anexo desabilitado'),
+            ]
+        ]);
 
         $this->registerOpportunityMetadata('claimDisabled', [
             'label' => i::__('Desabilitar formulário de recursos'),
@@ -136,33 +152,64 @@ class Plugin extends \MapasCulturais\Plugin
 
         $this->registerOpportunityMetadata('claimFrom', [
             'label' => \MapasCulturais\i::__('Data de inicio do recurso'),
-            'type' => 'date',
+            'type' => 'datetime',
             'unserialize' => function ($value) {
-                return new DateTime($value);
+                return $value ? new DateTime($value ?: 'now') : $value;
             }
         ]);
 
         $this->registerOpportunityMetadata('claimTo', [
             'label' => \MapasCulturais\i::__('Data de fim do recurso'),
-            'type' => 'date',
+            'type' => 'datetime',
             'unserialize' => function ($value) {
-                return new DateTime($value);
+                return $value ? new DateTime($value ?: 'now') : $value;
             }
         ]);
 
         $this->registerRegistrationMetadata('acceptClaim', [
             'label' => \MapasCulturais\i::__('Idicação de aceite do recurso por parte do administrador'),
             'type' => 'bool',
-            'default' => false
+            'default' => false,
+            'serialize' => function($value){
+                return $value == 1 ? true : false;
+            },
+            'unserialize' => function($value){
+                return $value == 1 ? true : false;
+            }
         ]);
 
         $app->registerFileGroup(
             'registration',
             new FileGroup(
                 'formClaimUpload',
-                ['^application/pdf'],
-                'O arquivo não é valido',
-                true
+                [
+                    'application/pdf',
+                    'image/(gif|jpeg|pjpeg|png)',
+    
+                    // ms office
+                    'application/msword',
+                    'application/vnd\.openxmlformats-officedocument\.wordprocessingml\.document',
+                    'application/vnd\.ms-excel',
+                    'application/vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet',
+                    'application/vnd\.ms-powerpoint',
+                    'application/vnd\.openxmlformats-officedocument\.presentationml\.presentation',
+                    'application/vnd\.openxmlformats-officedocument\.presentationml\.slideshow',
+    
+                    // libreoffice / openoffice
+                    'application/vnd\.oasis\.opendocument\.chart',
+                    'application/vnd\.oasis\.opendocument\.formula',
+                    'application/vnd\.oasis\.opendocument\.graphics',
+                    'application/vnd\.oasis\.opendocument\.image',
+                    'application/vnd\.oasis\.opendocument\.presentation',
+                    'application/vnd\.oasis\.opendocument\.spreadsheet',
+                    'application/vnd\.oasis\.opendocument\.text',
+                    'application/vnd\.oasis\.opendocument\.text-master',
+                    'application/vnd\.oasis\.opendocument\.text-web',
+                ],
+                'O arquivo não é um documento válido, verifique o tipo de arquivo.',
+                true,
+                private: true
+
             )
         );
 
@@ -179,11 +226,48 @@ class Plugin extends \MapasCulturais\Plugin
                     'application/x-abiword',
                     'application/msword'
                 ],
-                'O arquivo não é valido',
-                true
+                'O arquivo não é válido',
+                true,
             )
         );
     }
+
+    public function createNotification($user, $message)
+    {
+        $message = $message;
+        $notification = new Notification;
+        $notification->user = $user;
+        $notification->message = $message;
+        $notification->save(true);
+    }
+    
+    public function sendMailRefusedClaim($registration, $message)
+    {
+        /** @var App $app */
+        $app = App::i();
+
+        $opportunity = $registration->opportunity;
+
+        $dataValue = [
+            'message' => $message,
+            'userName' => $registration->owner->name,
+        ];
+
+        $message = $app->renderMailerTemplate('claim_refused', $dataValue);
+
+        if (array_key_exists('mailer.from', $app->config) && !empty(trim($app->config['mailer.from']))) {
+            /*
+             * Envia e-mail para o administrador da Oportunidade
+             */
+            $app->createAndSendMailMessage([
+                'from' => $app->config['mailer.from'],
+                'to' => $registration->owner->emailPrivado,
+                'subject' => $message['title'],
+                'body' => $message['body']
+            ]);
+        }
+    }
+    
 
     public function sendMailClaim($entity)
     {
