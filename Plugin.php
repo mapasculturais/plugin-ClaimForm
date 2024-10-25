@@ -106,6 +106,12 @@ class Plugin extends \MapasCulturais\Plugin
                 }
             }
         },1000);
+
+        $app->hook('view.requestedEntity(Registration).result', function (&$result) {
+            if($registration = $this->controller->requestedEntity) {
+                $result['currentUserPermissions']['sendClaimMessage'] = $registration->canUser('sendClaimMessage');
+            }
+        });
     }
 
     public function validateErros($controller)
