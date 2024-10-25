@@ -93,12 +93,19 @@ class Plugin extends \MapasCulturais\Plugin
             });
 
             $app->hook('component(opportunity-phases-timeline).registration:end', function () {
-                $registration = $this->controller->requestedEntity;
-                if($registration->canUser('sendClaimMessage')){
-                    $this->part('opportunity-claim-form-component');
-                }
+                $this->part('opportunity-claim-form-component');
             });
         });
+
+        $app->hook('mapas.printJsObject:before', function () use($app) {
+            if(isset($this->jsObject['registrationPhases'])) {
+                foreach($this->jsObject['registrationPhases'] as &$reg) {
+                    $registration = $app->repo('Registration')->find($reg['id']);
+                    $reg['currentUserPermissions'] = $reg['currentUserPermissions'] ?? $registration->currentUserPermissions;
+                    $reg['currentUserPermissions']['sendClaimMessage'] = $registration->canUser('sendClaimMessage');
+                }
+            }
+        },1000);
     }
 
     public function validateErros($controller)

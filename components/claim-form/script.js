@@ -61,10 +61,11 @@ app.component('claim-form', {
             modal.open();
         },
         isActive() {
-            if (this.entity.opportunity.status > 0 && this.entity.opportunity.publishedRegistrations && this.entity.opportunity.claimDisabled === "0") {
+            if (this.entity.opportunity.status !== 0 && this.entity.opportunity.publishedRegistrations) {
                 return true;
+            } else {
+                return false;
             }
-            return true;
         },
         setFile($event) {
             this.newFile = $event;
@@ -88,7 +89,7 @@ app.component('claim-form', {
             return $MAPAS.config.opportunityClaimForm.isAdmin;
         },
         canManipulate(){
-            return $MAPAS.config.opportunityClaimForm.canManipulate;
+            return this.entity.currentUserPermissions.sendClaimMessage;
         },
         modalTitle() {
             return this.text('Solicitar Recurso');
