@@ -20,12 +20,11 @@ $this->import('
             
             <h4 v-if="entity.files?.[groupFileUpload]" class="opportunity-claim-form__resource semibold"><?php i::_e('Recurso') ?></h4>
             <h4 v-else class="opportunity-claim-form__resource semibold"><?php i::_e('Discorda do resultado?') ?></h4>
-            
             <entity-file 
                 :entity="entity" 
                 group-name="formClaimUpload" 
                 title="" 
-                :editable="!entity.files?.[groupFileUpload] && !uploadedFile" 
+                :editable="!entity.files?.[groupFileUpload] && !uploadedFile || !entity.acceptClaim" 
                 title-modal="<?php i::_e('Solicitação de recurso') ?>" 
                 @set-file="setFile($event)" 
                 @uploaded="uploaded($event)"

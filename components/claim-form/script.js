@@ -88,7 +88,21 @@ app.component('claim-form', {
             return $MAPAS.config.opportunityClaimForm.isAdmin;
         },
         canManipulate(){
-            return $MAPAS.config.opportunityClaimForm.canManipulate;
+            let canManipulate = false;
+            const global = useGlobalState();
+            if(this.entity.opportunity?.claimFrom && this.entity.opportunity?.claimTo) {
+                if(this.entity.opportunity?.claimFrom.isPast() && this.entity.opportunity?.claimTo.isFuture()) {
+                    canManipulate = true;
+                }
+
+                if(canManipulate) {
+                    if(this.entity.currentUserPermissions['@control'] && !this.entity.acceptClaim) {
+                        canManipulate = true
+                    }
+                }
+            }
+
+            return canManipulate;
         },
         modalTitle() {
             return this.text('Solicitar Recurso');

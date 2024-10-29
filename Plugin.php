@@ -99,6 +99,10 @@ class Plugin extends \MapasCulturais\Plugin
                 }
             });
         });
+
+        $app->hook("module(OpportunityPhases).dataCollectionPhaseData", function(&$data) {
+            $data .= ',claimEmail,claimDisabled,claimFrom,claimTo';
+        });
     }
 
     public function validateErros($controller)
