@@ -24,7 +24,7 @@ $this->import('
                 :entity="entity" 
                 group-name="formClaimUpload" 
                 title="" 
-                :editable="!entity.files?.[groupFileUpload] && !uploadedFile || !entity.acceptClaim" 
+                :editable="!entity.files?.[groupFileUpload] && !uploadedFile" 
                 title-modal="<?php i::_e('Solicitação de recurso') ?>" 
                 @set-file="setFile($event)" 
                 @uploaded="uploaded($event)"
