@@ -74,8 +74,9 @@ $this->import('
                 </div>
 
                 <div>
-                    <span v-if="entity.acceptClaim" class="success__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo aceito') ?></span>
-                    <span v-if="!entity.acceptClaim" class="helper__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo em analise') ?></span>
+                    <span v-if="entity.acceptClaim == 1 || entity.acceptClaim == 4" class="helper__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo em analise') ?></span>
+                    <span v-if="entity.acceptClaim == 2" class="success__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo aceito') ?></span>
+                    <span v-if="entity.acceptClaim == 3" class="danger__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo rejeitado') ?></span>
                 </div>
             </div>
         </div>
@@ -88,8 +89,14 @@ $this->import('
             </entity-file>
         </div>
         <div class="opportunity-claim-form__btn">
-            <button class="button button--primary" v-if="!entity.acceptClaim" @click="acceptClaim()"><?php i::_e('Aceitar arquivo') ?></button>
-            <button class="button button--primary-outline" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
+            <button class="button button--primary" v-if="!entity.acceptClaim || entity.acceptClaim == 1 || entity.acceptClaim == 4 || entity.acceptClaim == 3" @click="acceptClaim()"><?php i::_e('Aceitar arquivo') ?></button>
+            <button class="button button--primary-outline" v-if="entity.acceptClaim == 1 || entity.acceptClaim == 2 || entity.acceptClaim == 4" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
+            <button class="button button--primary-outline" v-if="entity.acceptClaim  == 3" @click="deleteClaim()"><?php i::_e('Apagar arquivo') ?></button>
+        </div>
+        <div>
+            <span v-if="entity.acceptClaim == 1 || entity.acceptClaim == 4" class="helper__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo em analise') ?></span>
+            <span v-if="entity.acceptClaim == 2" class="success__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo aceito') ?></span>
+            <span v-if="entity.acceptClaim == 3" class="danger__color bold opportunity-claim-form__status"><mc-icon name="dot"></mc-icon><?php i::_e('Arquivo rejeitado') ?></span>
         </div>
     </div>
 </template>

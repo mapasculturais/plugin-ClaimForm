@@ -45,12 +45,27 @@ class Plugin extends \MapasCulturais\Plugin
             if ($this->group === "formClaimUpload"){
                 $registration = $this->owner;
                 $app->disableAccessControl();
-                $registration->acceptClaim = false;
+                $registration->acceptClaim = 4;
                 $registration->save(true);
+                $message = sprintf(i::__("Vocẽ já pode inserir um novo arquivo de recurso para inscrição %s na oportunidade %s."),$registration->number, $registration->opportunity->firstPhase->name);
+                $self->createNotification($registration->owner->user, $message);
+                $self->sendMailEvolutionClaim($registration, $message, i::__("Recurso reaberto para a inscrição {$registration->number}"));
+                $app->enableAccessControl();
+            }
+        });
+
+        $app->hook("entity(Registration).save:after", function() use ($app, $self){
+            $registration = $this;
+            if($registration->acceptClaim == 3) {
                 $message = sprintf(i::__("O arquivo anexado ao recurso da sua inscrição %s na oportunidade %s foi rejeitado."),$registration->number, $registration->opportunity->firstPhase->name);
                 $self->createNotification($registration->owner->user, $message);
-                $self->sendMailRefusedClaim($registration, $message);
-                $app->enableAccessControl();
+                $self->sendMailEvolutionClaim($registration, $message, i::__("Arquivo de recurso rejeitado"));
+            }
+
+            if($registration->acceptClaim == 2) {
+                $message = sprintf(i::__("O arquivo anexado ao recurso da sua inscrição %s na oportunidade %s foi acaito."),$registration->number, $registration->opportunity->firstPhase->name);
+                $self->createNotification($registration->owner->user, $message);
+                $self->sendMailEvolutionClaim($registration, $message, i::__("Arquivo de recurso aceito"));
             }
         });
 
@@ -63,7 +78,7 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('can(RegistrationFile.<<*>>)', function ($user, &$result) use ($app, $self) {
             /** @var \MapasCulturais\Entities\RegistrationFile $this */
             if ($this->group === "formClaimUpload" && $this->owner->opportunity->publishedRegistrations) {
-                if(!$this->owner->acceptClaim || $app->user->is('saasSuperAdmin')){
+                if(!$this->owner->acceptClaim || $this->owner->acceptClaim == 1 || $this->owner->acceptClaim == 4 || $app->user->is('saasSuperAdmin')){
                     $result = true;
                 }
             }
@@ -172,14 +187,8 @@ class Plugin extends \MapasCulturais\Plugin
 
         $this->registerRegistrationMetadata('acceptClaim', [
             'label' => \MapasCulturais\i::__('Idicação de aceite do recurso por parte do administrador'),
-            'type' => 'bool',
-            'default' => false,
-            'serialize' => function($value){
-                return $value == 1 ? true : false;
-            },
-            'unserialize' => function($value){
-                return $value == 1 ? true : false;
-            }
+            'type' => 'int',
+            'default' => 1,
         ]);
 
         $app->registerFileGroup(
@@ -245,7 +254,7 @@ class Plugin extends \MapasCulturais\Plugin
         $notification->save(true);
     }
     
-    public function sendMailRefusedClaim($registration, $message)
+    public function sendMailEvolutionClaim($registration, $message, $subject = null)
     {
         /** @var App $app */
         $app = App::i();
@@ -266,7 +275,7 @@ class Plugin extends \MapasCulturais\Plugin
             $app->createAndSendMailMessage([
                 'from' => $app->config['mailer.from'],
                 'to' => $registration->owner->emailPrivado,
-                'subject' => $message['title'],
+                'subject' => $subject ?? $message['title'],
                 'body' => $message['body']
             ]);
         }
@@ -360,7 +369,7 @@ class Plugin extends \MapasCulturais\Plugin
         $app = App::i();
         if ($this->claimOpen($registration)) {
             if ((($app->user->profile->id == $registration->owner->id)) || ($app->user->profile->id == $registration->owner->user->profile->id) || $app->user->is('saasSuperAdmin')) {
-                if(!$registration->acceptClaim){
+                if($registration->acceptClaim == 1 || $registration->acceptClaim == 4){
                     return true;
                 }
             }

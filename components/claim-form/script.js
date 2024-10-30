@@ -42,13 +42,18 @@ app.component('claim-form', {
 			return phaseOpportunity.publishedRegistrations && (isRegistrationOnly || isEvaluation);
 		},
        async acceptClaim() {
-            this.entity.acceptClaim = 1;
+            this.entity.acceptClaim = 2;
             this.entity.save();
             this.reloadPage();
         },
         refuseClaim (){
+            this.entity.acceptClaim = 3;
+            this.entity.save();
+            this.reloadPage();
+        },
+        deleteClaim() {
             this.entity.files?.[this.groupFileUpload].delete();
-            this.entity.acceptClaim = "";
+            this.entity.acceptClaim = 4;
             this.entity.save();
             this.reloadPage();
         },
@@ -96,7 +101,7 @@ app.component('claim-form', {
                 }
 
                 if(canManipulate) {
-                    if(this.entity.currentUserPermissions['@control'] && !this.entity.acceptClaim) {
+                    if(this.entity.currentUserPermissions['@control'] && this.entity.acceptClaim == 1 || this.entity.acceptClaim == 4) {
                         canManipulate = true
                     }
                 }
