@@ -18,11 +18,15 @@ if($entity instanceof MapasCulturais\Entities\Registration){
     }
 }
 
+$can = false;
+if($entity->getClassName() === 'MapasCulturais\Entities\Registration') {
+    $can = $entity->opportunity->canUser('@control');
+}
 
 $config = [
     'registrationId' => $entity->id,
     'canManipulate' => $canManipulate,
-    'isAdmin' => $app->user->is('admin'),
+    'isAdmin' => $app->user->is('admin') ? true : $can,
 ];
 
 $this->jsObject['config']['opportunityClaimForm'] = $config;

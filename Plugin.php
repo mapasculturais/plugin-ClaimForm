@@ -78,7 +78,7 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('can(RegistrationFile.<<*>>)', function ($user, &$result) use ($app, $self) {
             /** @var \MapasCulturais\Entities\RegistrationFile $this */
             if ($this->group === "formClaimUpload" && $this->owner->opportunity->publishedRegistrations) {
-                if(!$this->owner->acceptClaim || $this->owner->acceptClaim == 1 || $this->owner->acceptClaim == 4 || $app->user->is('saasSuperAdmin')){
+                if(!$this->owner->acceptClaim || $this->owner->acceptClaim == 1 || $this->owner->acceptClaim == 4 || $this->owner->opportunity->canUser('@control')){
                     $result = true;
                 }
             }
@@ -93,6 +93,30 @@ class Plugin extends \MapasCulturais\Plugin
             } else {
                 $canUser = false;
             }
+        });
+
+        $app->hook('PATCH(registration.single):data', function() use ($app, $self) {
+            $request = $this->data;
+
+            $app->hook('entity(Registration).canUser(modify)', function ($user, &$canUser) use ($self, $request, $app) {
+                /** @var Registration $this */
+                $opportunity = $this->opportunity;
+                if (in_array('acceptClaim', array_keys($request)) && $this->status > 0 && $opportunity->publishedRegistrations && $opportunity->canUser('@control')) {
+                    $canUser = true;
+                } else {
+                    $canUser = false;
+                }
+            });
+
+            $app->hook('entity(RegistrationMeta).canUser(create)', function ($user, &$canUser) use ($self, $request, $app) {
+                /** @var Registration $this */
+                $opportunity = $this->opportunity;
+                if (in_array('acceptClaim', array_keys($request)) && $this->status > 0 && $opportunity->publishedRegistrations && $opportunity->canUser('@control')) {
+                    $canUser = true;
+                } else {
+                    $canUser = false;
+                }
+            });
         });
 
         /** Envia o e-mail de recurso para o administrador */
