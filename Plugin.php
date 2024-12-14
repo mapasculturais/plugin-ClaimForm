@@ -103,9 +103,7 @@ class Plugin extends \MapasCulturais\Plugin
                 $opportunity = $this->opportunity;
                 if (in_array('acceptClaim', array_keys($request)) && $this->status > 0 && $opportunity->publishedRegistrations && $opportunity->canUser('@control')) {
                     $canUser = true;
-                } else {
-                    $canUser = false;
-                }
+                } 
             });
 
             $app->hook('entity(RegistrationMeta).canUser(create)', function ($user, &$canUser) use ($self, $request, $app) {
@@ -113,9 +111,7 @@ class Plugin extends \MapasCulturais\Plugin
                 $opportunity = $this->opportunity;
                 if (in_array('acceptClaim', array_keys($request)) && $this->status > 0 && $opportunity->publishedRegistrations && $opportunity->canUser('@control')) {
                     $canUser = true;
-                } else {
-                    $canUser = false;
-                }
+                } 
             });
         });
 
@@ -309,12 +305,14 @@ class Plugin extends \MapasCulturais\Plugin
             /*
              * Envia e-mail para o administrador da Oportunidade
              */
-            $app->createAndSendMailMessage([
-                'from' => $app->config['mailer.from'],
-                'to' => $registration->owner->emailPrivado,
-                'subject' => $subject ?? $message['title'],
-                'body' => $message['body']
-            ]);
+            if($email = $registration->owner->emailPrivado ? $registration->owner->emailPrivado : $registration->owner->emailPublico) {
+                $app->createAndSendMailMessage([
+                    'from' => $app->config['mailer.from'],
+                    'to' => $email,
+                    'subject' => $subject ?? $message['title'],
+                    'body' => $message['body']
+                ]);
+            }
         }
     }
     
