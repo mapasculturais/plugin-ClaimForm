@@ -90,7 +90,7 @@ $this->import('
         </div>
         <div class="opportunity-claim-form__btn">
             <button class="button button--primary" v-if="!entity.acceptClaim || entity.acceptClaim == 1 || entity.acceptClaim == 4 || entity.acceptClaim == 3" @click="acceptClaim()"><?php i::_e('Aceitar arquivo') ?></button>
-            <button class="button button--primary-outline" v-if="entity.acceptClaim == 1 || entity.acceptClaim == 2 || entity.acceptClaim == 4" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
+            <button class="button button--primary-outline" v-if="!entity.acceptClaim || entity.acceptClaim == 1 || entity.acceptClaim == 2 || entity.acceptClaim == 4" @click="refuseClaim()"><?php i::_e('Rejeitar arquivo') ?></button>
             <button class="button button--primary-outline" v-if="entity.acceptClaim  == 3" @click="deleteClaim()"><?php i::_e('Apagar arquivo') ?></button>
         </div>
         <div>
