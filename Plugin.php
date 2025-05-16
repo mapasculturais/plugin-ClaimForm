@@ -15,21 +15,28 @@ class Plugin extends \MapasCulturais\Plugin
     {
         /** @var App $app */
         $app = App::i();
+             
+        
+        parent::__construct($config);
+    }
 
-        $app->hook('app.modules.init:before', function (&$modules) use ($config) {
+    public static function preInit()
+    {
+        $app = App::i();
+
+        $app->hook('app.modules.init:before', function (&$modules) {
             if (($key = array_search('OpportunityClaimForm', $modules)) !== false) {
                 unset($modules[$key]);
             }
         });
-        
-        parent::__construct($config);
     }
+    
 
     public function _init()
     {
         /** @var App $app */
         $app = App::i();
-
+        
         //load css
         $app->hook('GET(<<*>>.<<*>>)', function() use ($app) {
             $app->view->enqueueStyle('app-v2', 'ClaimForm', 'css/plugin-claim-form.css');
@@ -108,8 +115,8 @@ class Plugin extends \MapasCulturais\Plugin
 
             $app->hook('entity(RegistrationMeta).canUser(create)', function ($user, &$canUser) use ($self, $request, $app) {
                 /** @var Registration $this */
-                $opportunity = $this->opportunity;
-                if (in_array('acceptClaim', array_keys($request)) && $this->status > 0 && $opportunity->publishedRegistrations && $opportunity->canUser('@control')) {
+                $opportunity = $this->owner->opportunity;
+                if (in_array('acceptClaim', array_keys($request)) && $this->owner->status > 0 && $opportunity->publishedRegistrations && $opportunity->canUser('@control')) {
                     $canUser = true;
                 } 
             });
@@ -121,15 +128,12 @@ class Plugin extends \MapasCulturais\Plugin
             $self->sendMailClaimCertificate($this);
         });
 
-        $app->hook('app.plugins.preInit:before', function () use($app) {
-            
-            $app->hook("component(opportunity-phase-config-data-collection):bottom", function(){
-                $this->part('opportunity-claim-config');
-            });
+        $app->hook("component(opportunity-phase-config-data-collection):bottom", function(){
+            $this->part('opportunity-claim-config');
+        });
 
-            $app->hook('component(opportunity-phases-timeline).registration:end', function () {
-                $this->part('opportunity-claim-form-component');
-            });
+        $app->hook('component(opportunity-phases-timeline).registration:end', function () {
+            $this->part('opportunity-claim-form-component');
         });
 
         $app->hook("module(OpportunityPhases).dataCollectionPhaseData", function(&$data) {
