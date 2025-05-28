@@ -36,7 +36,7 @@ class Plugin extends \MapasCulturais\Plugin
     {
         /** @var App $app */
         $app = App::i();
-        
+       
         //load css
         $app->hook('GET(<<*>>.<<*>>)', function() use ($app) {
             $app->view->enqueueStyle('app-v2', 'ClaimForm', 'css/plugin-claim-form.css');
@@ -77,8 +77,8 @@ class Plugin extends \MapasCulturais\Plugin
         });
 
         // Adiciona seção de configuração do formulário de recurso dentro da configuração do formulário
-        $app->hook("view.partial(singles/opportunity-registrations--export):after", function () {
-            $this->part('claim-configuration', ['opportunity' => $this->controller->requestedEntity]);
+        $app->hook("component(opportunity-phase-config-evaluation):bottom", function () {
+            $this->part('opportunity-claim-config', ['opportunity' => $this->controller->requestedEntity]);
         });
 
         // Define a permissãopara inserir arquivos na inscrição apos a mesma estar fechada
