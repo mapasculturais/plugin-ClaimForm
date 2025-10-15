@@ -143,6 +143,9 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook('mapas.printJsObject:before', function () use($app) {
             if(isset($this->jsObject['registrationPhases'])) {
                 foreach($this->jsObject['registrationPhases'] as &$reg) {
+                    if (!isset($reg['id'])) {
+                        continue;
+                    }
                     $registration = $app->repo('Registration')->find($reg['id']);
                     $reg['currentUserPermissions'] = $reg['currentUserPermissions'] ?? $registration->currentUserPermissions;
                     $reg['currentUserPermissions']['sendClaimMessage'] = $registration->canUser('sendClaimMessage');
